@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Sparkles,
   Swords,
@@ -55,6 +55,21 @@ export default function DiagnosisClient({
   const [isDownloading, setIsDownloading] = useState(false);
   const [showOgPreview, setShowOgPreview] = useState(false);
   const [showDictModal, setShowDictModal] = useState(false);
+  const topAnchorRef = useRef<HTMLDivElement>(null);
+
+  // スマホのソフトキーボード収納やDOM高さ変動時にも確実に最上部へ移動させる関数
+  const scrollToTop = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const executeScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      topAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    executeScroll();
+    requestAnimationFrame(() => {
+      executeScroll();
+    });
+    setTimeout(executeScroll, 100);
+  }, []);
 
   // URLクエリパラメータを同期する関数
   const syncUrlParams = useCallback((targetName: string, targetMode: DiagnosisMode) => {
@@ -88,23 +103,28 @@ export default function DiagnosisClient({
 
     if (!targetName) return;
 
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    // スマホで入力欄にフォーカスが残っているとスクロールが入力欄に引き戻されるのを防ぐ
+    if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
     }
 
     if (skipAnimation) {
       const diag = generateDiagnosis(targetName, targetMode);
       setResult(diag);
       syncUrlParams(targetName, targetMode);
+      scrollToTop();
       return;
     }
 
     setIsSummoning(true);
+    scrollToTop();
+
     setTimeout(() => {
       const diag = generateDiagnosis(targetName, targetMode);
       setResult(diag);
       setIsSummoning(false);
       syncUrlParams(targetName, targetMode);
+      scrollToTop();
     }, 650);
   };
 
@@ -226,7 +246,10 @@ export default function DiagnosisClient({
   const rarityInfo = result ? RARITY_META[result.rarity] : null;
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-between px-4 py-8 md:py-12 selection:bg-amber-500/30 selection:text-amber-200">
+    <div
+      ref={topAnchorRef}
+      className="relative min-h-screen flex flex-col items-center justify-between px-4 py-8 md:py-12 selection:bg-amber-500/30 selection:text-amber-200 [overflow-anchor:none]"
+    >
       {/* 背景の魔導オーラ＆幾何学装飾 */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[760px] h-[420px] rounded-full bg-amber-600/10 blur-[130px]" />
@@ -235,7 +258,7 @@ export default function DiagnosisClient({
       </div>
 
       {/* メインコンテナ */}
-      <main className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center">
+      <main className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center [overflow-anchor:none]">
         {/* ガチャ召喚ローディング演出（一番上に表示） */}
         {isSummoning && (
           <div className="w-full py-20 flex flex-col items-center justify-center bg-stone-950/80 border border-amber-500/30 rounded-3xl mb-10">
