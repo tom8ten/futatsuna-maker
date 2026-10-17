@@ -95,7 +95,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 export default async function HomePage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
-  const initialName = typeof resolvedParams.name === "string" ? resolvedParams.name : "山田太郎";
+  const hasNameParam =
+    typeof resolvedParams.name === "string" && resolvedParams.name.trim().length > 0;
+  const initialName = hasNameParam ? (resolvedParams.name as string) : "山田太郎";
   const modeParam = typeof resolvedParams.mode === "string" ? resolvedParams.mode : "standard";
   const initialDate = typeof resolvedParams.date === "string" ? resolvedParams.date : undefined;
   const initialMode: DiagnosisMode = modeParam === "daily" ? "daily" : "standard";
@@ -105,6 +107,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       initialName={initialName}
       initialMode={initialMode}
       initialDate={initialDate}
+      autoShowResult={hasNameParam}
     />
   );
 }

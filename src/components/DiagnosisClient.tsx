@@ -34,17 +34,21 @@ interface DiagnosisClientProps {
   initialName: string;
   initialMode: DiagnosisMode;
   initialDate?: string;
+  autoShowResult?: boolean;
 }
 
 export default function DiagnosisClient({
   initialName,
   initialMode,
   initialDate,
+  autoShowResult = false,
 }: DiagnosisClientProps) {
   const [inputName, setInputName] = useState(initialName);
   const [mode, setMode] = useState<DiagnosisMode>(initialMode);
   const [result, setResult] = useState<DiagnosisResult | null>(() =>
-    initialName.trim() ? generateDiagnosis(initialName, initialMode, initialDate) : null
+    autoShowResult && initialName.trim()
+      ? generateDiagnosis(initialName, initialMode, initialDate)
+      : null
   );
   const [isSummoning, setIsSummoning] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -84,6 +88,10 @@ export default function DiagnosisClient({
 
     if (!targetName) return;
 
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     if (skipAnimation) {
       const diag = generateDiagnosis(targetName, targetMode);
       setResult(diag);
@@ -103,7 +111,7 @@ export default function DiagnosisClient({
   // モード切り替え時
   const handleModeToggle = (newMode: DiagnosisMode) => {
     setMode(newMode);
-    if (inputName.trim()) {
+    if (result && inputName.trim()) {
       handleDiagnose(inputName, newMode, false);
     }
   };
@@ -228,133 +236,9 @@ export default function DiagnosisClient({
 
       {/* メインコンテナ */}
       <main className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center">
-        {/* ヘッダー・タイトルセクション */}
-        <header className="text-center mb-8 w-full">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs md:text-sm tracking-widest mb-4 shadow-lg shadow-amber-950/50">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>古の魔導書が暴く、あなたの真の称号と戦闘力</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-wider bg-gradient-to-b from-amber-100 via-amber-300 to-amber-600 bg-clip-text text-transparent drop-shadow-[0_4px_24px_rgba(245,158,11,0.35)]">
-            二つ名メーカー
-          </h1>
-          <p className="mt-3 text-stone-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-            名前から決定論的ハッシュで唯一無二の異名を召喚。
-            <span className="text-amber-300/90 font-semibold">王道中二病85% × 哀愁シュール15%</span>
-            の禁断ガチャ診断！
-          </p>
-        </header>
-
-        {/* 入力＆モード切替パネル（魔導書コンソール風） */}
-        <section className="w-full bg-gradient-to-b from-stone-900/95 to-stone-950/95 border border-amber-600/40 rounded-2xl p-5 sm:p-7 shadow-[0_0_50px_rgba(0,0,0,0.85)] backdrop-blur-md mb-8">
-          {/* モード切り替えトグル */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-5 mb-5 border-b border-amber-500/20">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-stone-300">
-              <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>鑑定アルゴリズム選択：</span>
-            </div>
-
-            <div className="grid grid-cols-2 bg-stone-950 p-1 rounded-xl border border-amber-500/30 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => handleModeToggle("standard")}
-                className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  mode === "standard"
-                    ? "bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 shadow-md shadow-amber-500/20"
-                    : "text-stone-400 hover:text-stone-200"
-                }`}
-              >
-                <Crown className="w-3.5 h-3.5" />
-                <span>通常モード（名前固定）</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleModeToggle("daily")}
-                className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  mode === "daily"
-                    ? "bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-md shadow-purple-500/25"
-                    : "text-stone-400 hover:text-stone-200"
-                }`}
-              >
-                <Calendar className="w-3.5 h-3.5" />
-                <span>今日の運勢モード（日替わり）</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 名前入力フォーム */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleDiagnose();
-            }}
-            className="flex flex-col sm:flex-row gap-3"
-          >
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={inputName}
-                onChange={(e) => setInputName(e.target.value)}
-                placeholder="名前やハンドルネームを入力（例：山田太郎 / @user）"
-                maxLength={32}
-                aria-label="診断する名前"
-                className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-stone-950/90 border border-amber-500/40 text-stone-100 placeholder-stone-500 text-base sm:text-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/25 transition-all"
-              />
-              {inputName && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-500">
-                  {inputName.length}/32
-                </span>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={!inputName.trim() || isSummoning}
-              className="px-7 py-3.5 sm:py-4 rounded-xl font-black text-base sm:text-lg bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-stone-950 hover:brightness-110 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none transition-all shadow-[0_0_25px_rgba(245,158,11,0.4)] flex items-center justify-center gap-2 cursor-pointer shrink-0"
-            >
-              <Wand2 className={`w-5 h-5 ${isSummoning ? "animate-spin" : ""}`} />
-              <span>{isSummoning ? "魔導書詠唱中..." : "異名を覚醒させる"}</span>
-            </button>
-          </form>
-
-          {/* クイック体験サンプル＆確率表ボタン */}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs text-stone-400 mr-1">一発体験：</span>
-              {samplePresets.map((preset) => (
-                <button
-                  key={preset.label}
-                  type="button"
-                  onClick={() => {
-                    setInputName(preset.name);
-                    setMode("standard");
-                    handleDiagnose(preset.name, "standard", false);
-                  }}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-950/60 border border-stone-700 hover:border-amber-500/50 text-stone-300 hover:text-amber-200 transition-colors cursor-pointer flex items-center gap-1"
-                >
-                  <span>{preset.label}</span>
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
-                    {preset.badge}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowDictModal(true)}
-              className="text-xs text-amber-400/80 hover:text-amber-300 underline underline-offset-4 flex items-center gap-1 cursor-pointer"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>排出確率・辞書データ({PREFIXES.length + COOL_SUFFIXES.length + GAP_SUFFIXES.length}種)を見る</span>
-            </button>
-          </div>
-        </section>
-
-        {/* ガチャ召喚ローディング演出 */}
+        {/* ガチャ召喚ローディング演出（一番上に表示） */}
         {isSummoning && (
-          <div className="w-full py-20 flex flex-col items-center justify-center bg-stone-950/80 border border-amber-500/30 rounded-3xl mb-8">
+          <div className="w-full py-20 flex flex-col items-center justify-center bg-stone-950/80 border border-amber-500/30 rounded-3xl mb-10">
             <div className="relative w-24 h-24 flex items-center justify-center mb-5">
               <div className="absolute inset-0 rounded-full border-2 border-dashed border-amber-400 animate-spin" />
               <div className="absolute inset-2 rounded-full border border-purple-400/60 animate-ping" />
@@ -369,9 +253,9 @@ export default function DiagnosisClient({
           </div>
         )}
 
-        {/* 診断結果カード（黒背景×金文字・魔導書・RPGステータス画面風） */}
+        {/* 診断結果カード（生成されたら一番上に表示） */}
         {!isSummoning && result && rarityInfo && (
-          <div className="w-full space-y-6 animate-in fade-in duration-500">
+          <div className="w-full space-y-6 mb-10 animate-in fade-in duration-500">
             {/* UR / SSR 出現時の特別バナー */}
             {rarityInfo.isUltraRare && (
               <div
@@ -671,6 +555,130 @@ export default function DiagnosisClient({
             </section>
           </div>
         )}
+
+        {/* ヘッダー・タイトルセクション */}
+        <header className="text-center mb-8 w-full">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs md:text-sm tracking-widest mb-4 shadow-lg shadow-amber-950/50">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>古の魔導書が暴く、あなたの真の称号と戦闘力</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-wider bg-gradient-to-b from-amber-100 via-amber-300 to-amber-600 bg-clip-text text-transparent drop-shadow-[0_4px_24px_rgba(245,158,11,0.35)]">
+            二つ名メーカー
+          </h1>
+          <p className="mt-3 text-stone-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+            名前から決定論的ハッシュで唯一無二の異名を召喚。
+            <span className="text-amber-300/90 font-semibold">王道中二病85% × 哀愁シュール15%</span>
+            の禁断ガチャ診断！
+          </p>
+        </header>
+
+        {/* 入力＆モード切替パネル（魔導書コンソール風） */}
+        <section className="w-full bg-gradient-to-b from-stone-900/95 to-stone-950/95 border border-amber-600/40 rounded-2xl p-5 sm:p-7 shadow-[0_0_50px_rgba(0,0,0,0.85)] backdrop-blur-md mb-8">
+          {/* モード切り替えトグル */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-5 mb-5 border-b border-amber-500/20">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-stone-300">
+              <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>鑑定アルゴリズム選択：</span>
+            </div>
+
+            <div className="grid grid-cols-2 bg-stone-950 p-1 rounded-xl border border-amber-500/30 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => handleModeToggle("standard")}
+                className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  mode === "standard"
+                    ? "bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 shadow-md shadow-amber-500/20"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <Crown className="w-3.5 h-3.5" />
+                <span>通常モード（名前固定）</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeToggle("daily")}
+                className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  mode === "daily"
+                    ? "bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow-md shadow-purple-500/25"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>今日の運勢モード（日替わり）</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 名前入力フォーム */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleDiagnose();
+            }}
+            className="flex flex-col sm:flex-row gap-3"
+          >
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={inputName}
+                onChange={(e) => setInputName(e.target.value)}
+                placeholder="名前やハンドルネームを入力（例：山田太郎 / @user）"
+                maxLength={32}
+                aria-label="診断する名前"
+                className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-stone-950/90 border border-amber-500/40 text-stone-100 placeholder-stone-500 text-base sm:text-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/25 transition-all"
+              />
+              {inputName && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-500">
+                  {inputName.length}/32
+                </span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={!inputName.trim() || isSummoning}
+              className="px-7 py-3.5 sm:py-4 rounded-xl font-black text-base sm:text-lg bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-stone-950 hover:brightness-110 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none transition-all shadow-[0_0_25px_rgba(245,158,11,0.4)] flex items-center justify-center gap-2 cursor-pointer shrink-0"
+            >
+              <Wand2 className={`w-5 h-5 ${isSummoning ? "animate-spin" : ""}`} />
+              <span>{isSummoning ? "魔導書詠唱中..." : "異名を覚醒させる"}</span>
+            </button>
+          </form>
+
+          {/* クイック体験サンプル＆確率表ボタン */}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-stone-400 mr-1">一発体験：</span>
+              {samplePresets.map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => {
+                    setInputName(preset.name);
+                    setMode("standard");
+                    handleDiagnose(preset.name, "standard", false);
+                  }}
+                  className="text-xs px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-950/60 border border-stone-700 hover:border-amber-500/50 text-stone-300 hover:text-amber-200 transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span>{preset.label}</span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
+                    {preset.badge}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowDictModal(true)}
+              className="text-xs text-amber-400/80 hover:text-amber-300 underline underline-offset-4 flex items-center gap-1 cursor-pointer"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>排出確率・辞書データ({PREFIXES.length + COOL_SUFFIXES.length + GAP_SUFFIXES.length}種)を見る</span>
+            </button>
+          </div>
+        </section>
       </main>
 
       {/* 辞書データ・レアリティ確率モーダル */}
