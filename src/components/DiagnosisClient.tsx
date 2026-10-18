@@ -396,21 +396,33 @@ export default function DiagnosisClient({
                     <BikkurimanSticker result={result} />
                   </div>
 
-                  <div className="pt-4 border-t border-amber-500/20">
+                  <div className="pt-4 border-t border-amber-500/20 overflow-hidden">
                     <p className="text-xs sm:text-sm text-amber-400/80 tracking-[0.25em] mb-2">
                       ― 覚醒せし魂の二つ名 ―
                     </p>
 
-                    <div className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-snug break-keep">
+                    <div className="font-black tracking-tight leading-snug break-words max-w-full">
                       <span
-                        className={`block text-lg sm:text-2xl md:text-3xl mb-1 font-bold ${
+                        className={`block mb-1.5 font-bold break-words ${
+                          result.prefix.length >= 15
+                            ? "text-sm sm:text-xl md:text-2xl"
+                            : "text-base sm:text-2xl md:text-3xl"
+                        } ${
                           result.rarity === "N" ? "text-stone-400" : "text-amber-200/90"
                         }`}
                       >
                         {result.prefix}
                       </span>
                       <span
-                        className={`bg-clip-text text-transparent bg-gradient-to-r ${
+                        className={`inline-block max-w-full break-words bg-clip-text text-transparent bg-gradient-to-r ${
+                          result.suffix.length >= 18
+                            ? "text-base sm:text-2xl md:text-3xl"
+                            : result.suffix.length >= 14
+                            ? "text-lg sm:text-3xl md:text-4xl"
+                            : result.suffix.length >= 10
+                            ? "text-xl sm:text-3xl md:text-4xl"
+                            : "text-2xl sm:text-4xl md:text-5xl"
+                        } ${
                           result.rarity === "UR"
                             ? "from-fuchsia-300 via-amber-200 to-cyan-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
                             : result.rarity === "N"
