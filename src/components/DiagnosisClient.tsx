@@ -29,6 +29,7 @@ import {
   COOL_SUFFIXES,
   GAP_SUFFIXES,
 } from "@/lib/dictionary";
+import BikkurimanSticker from "@/components/BikkurimanSticker";
 
 interface DiagnosisClientProps {
   initialName: string;
@@ -366,27 +367,33 @@ export default function DiagnosisClient({
                   </div>
                 </div>
 
-                {/* カード中央：生成された二つ名（メインビジュアル） */}
-                <div className="my-6 py-7 px-4 sm:px-6 rounded-2xl bg-gradient-to-b from-stone-900/90 via-[#120e0a] to-stone-950/90 border border-amber-500/35 text-center relative shadow-inner">
-                  <p className="text-xs sm:text-sm text-amber-400/80 tracking-[0.25em] mb-2">
-                    ― 覚醒せし魂の二つ名 ―
-                  </p>
+                {/* カード中央：ビックリマン風キラシール ＆ 生成された二つ名（メインビジュアル） */}
+                <div className="my-6 py-6 px-4 sm:px-6 rounded-2xl bg-gradient-to-b from-stone-900/90 via-[#120e0a] to-stone-950/90 border border-amber-500/35 text-center relative shadow-inner space-y-5">
+                  <div className="flex justify-center">
+                    <BikkurimanSticker result={result} />
+                  </div>
 
-                  <div className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-snug break-keep">
-                    <span className="block text-lg sm:text-2xl md:text-3xl text-amber-200/90 mb-1 font-bold">
-                      {result.prefix}
-                    </span>
-                    <span
-                      className={`bg-clip-text text-transparent bg-gradient-to-r ${
-                        result.rarity === "UR"
-                          ? "from-fuchsia-300 via-amber-200 to-cyan-300"
-                          : result.isGap
-                          ? "from-amber-200 via-yellow-300 to-rose-300"
-                          : "from-amber-100 via-yellow-300 to-amber-500"
-                      } drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]`}
-                    >
-                      『{result.suffix}』
-                    </span>
+                  <div className="pt-4 border-t border-amber-500/20">
+                    <p className="text-xs sm:text-sm text-amber-400/80 tracking-[0.25em] mb-2">
+                      ― 覚醒せし魂の二つ名 ―
+                    </p>
+
+                    <div className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-snug break-keep">
+                      <span className="block text-lg sm:text-2xl md:text-3xl text-amber-200/90 mb-1 font-bold">
+                        {result.prefix}
+                      </span>
+                      <span
+                        className={`bg-clip-text text-transparent bg-gradient-to-r ${
+                          result.rarity === "UR"
+                            ? "from-fuchsia-300 via-amber-200 to-cyan-300"
+                            : result.isGap
+                            ? "from-amber-200 via-yellow-300 to-rose-300"
+                            : "from-amber-100 via-yellow-300 to-amber-500"
+                        } drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]`}
+                      >
+                        『{result.suffix}』
+                      </span>
+                    </div>
                   </div>
                 </div>
 
