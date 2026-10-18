@@ -395,9 +395,9 @@ export function getPrismTypeLabel(rarity: Rarity): string {
     case "SR":
       return "銀アルミ角プリズム（キラ仕様）";
     case "R":
-      return "サンバースト扇プリズム";
+      return "サンバースト扇プリズム（キラ仕様）";
     case "N":
     default:
-      return "レトロカラーシール仕様";
+      return "ノーマル紙シール仕様（非キラ）";
   }
 }

@@ -216,7 +216,9 @@ export default function DiagnosisClient({
   >([]);
 
   useEffect(() => {
-    // クライアントマウント時にUR・SSR・シュールギャップが出るサンプル名を探索してボタン化
+    // クライアントマウント時に各レアリティ（N・R・ギャップ・SSR・UR）が出るサンプル名を探索してボタン化
+    let nName = "山田太郎";
+    let rName = "鈴木一郎";
     let urName = "佐藤健太";
     let ssrName = "高橋美咲";
     let gapName = "田中太郎";
@@ -224,6 +226,12 @@ export default function DiagnosisClient({
     for (let i = 1; i <= 1500; i++) {
       const candidate = `冒険者#${i}`;
       const d = generateDiagnosis(candidate, "standard");
+      if (d.rarity === "N" && !d.isGap && nName === "山田太郎") {
+        nName = candidate;
+      }
+      if (d.rarity === "R" && !d.isGap && rName === "鈴木一郎") {
+        rName = candidate;
+      }
       if (d.rarity === "UR" && urName === "佐藤健太") {
         urName = candidate;
       }
@@ -233,14 +241,23 @@ export default function DiagnosisClient({
       if (d.isGap && (d.rarity === "SR" || d.rarity === "SSR") && gapName === "田中太郎") {
         gapName = candidate;
       }
-      if (urName !== "佐藤健太" && ssrName !== "高橋美咲" && gapName !== "田中太郎") break;
+      if (
+        nName !== "山田太郎" &&
+        rName !== "鈴木一郎" &&
+        urName !== "佐藤健太" &&
+        ssrName !== "高橋美咲" &&
+        gapName !== "田中太郎"
+      ) {
+        break;
+      }
     }
 
     setSamplePresets([
-      { label: "王道サンプル", name: "山田太郎", badge: "定番" },
+      { label: "Nサンプル", name: nName, badge: "N (紙シール)" },
+      { label: "Rサンプル", name: rName, badge: "R (扇キラ)" },
       { label: "シュール15%枠", name: gapName, badge: "ギャップ" },
-      { label: "SSR確定サンプル", name: ssrName, badge: "SSR (4.5%)" },
-      { label: "UR神話級サンプル", name: urName, badge: "UR (0.5%)" },
+      { label: "SSRサンプル", name: ssrName, badge: "SSR (金キラ)" },
+      { label: "UR神話級", name: urName, badge: "UR (虹キラ)" },
     ]);
   }, []);
 
@@ -297,14 +314,18 @@ export default function DiagnosisClient({
               </div>
             )}
 
-            {/* 外枠（UR虹色 / SSR金色 / 通常金枠） */}
+            {/* 外枠（UR虹色 / SSR金色 / SR紫銀 / R蒼金 / N地味な石枠） */}
             <div
               className={`p-[3px] rounded-3xl transition-all ${
                 result.rarity === "UR"
                   ? "ur-rainbow-card"
                   : result.rarity === "SSR"
                   ? "ssr-gold-card"
-                  : "bg-gradient-to-b from-amber-500/70 via-amber-700/40 to-amber-900/70 shadow-[0_0_45px_rgba(217,119,6,0.2)]"
+                  : result.rarity === "SR"
+                  ? "bg-gradient-to-b from-purple-400/85 via-indigo-500/55 to-amber-500/75 shadow-[0_0_45px_rgba(168,85,247,0.3)]"
+                  : result.rarity === "R"
+                  ? "bg-gradient-to-b from-sky-400/75 via-amber-500/50 to-sky-700/75 shadow-[0_0_35px_rgba(56,189,248,0.22)]"
+                  : "bg-stone-700/70 shadow-none"
               }`}
             >
               {/* カード本体（スクショ映え特化エリア） */}
@@ -359,7 +380,9 @@ export default function DiagnosisClient({
                   {/* レアリティバッジ */}
                   <div className="flex items-center gap-2">
                     <div
-                      className={`relative overflow-hidden shimmer-effect px-4 py-1.5 rounded-xl bg-gradient-to-r ${rarityInfo.badgeBg} text-white font-black tracking-wider shadow-lg border border-amber-200/60`}
+                      className={`relative overflow-hidden ${
+                        result.rarity === "N" ? "border-stone-500/50" : "shimmer-effect border-amber-200/60"
+                      } px-4 py-1.5 rounded-xl bg-gradient-to-r ${rarityInfo.badgeBg} text-white font-black tracking-wider shadow-lg border`}
                     >
                       <span className="text-xs opacity-90 mr-1.5">RARITY</span>
                       <span className="text-xl sm:text-2xl">{result.rarity}</span>
@@ -379,17 +402,23 @@ export default function DiagnosisClient({
                     </p>
 
                     <div className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-snug break-keep">
-                      <span className="block text-lg sm:text-2xl md:text-3xl text-amber-200/90 mb-1 font-bold">
+                      <span
+                        className={`block text-lg sm:text-2xl md:text-3xl mb-1 font-bold ${
+                          result.rarity === "N" ? "text-stone-400" : "text-amber-200/90"
+                        }`}
+                      >
                         {result.prefix}
                       </span>
                       <span
                         className={`bg-clip-text text-transparent bg-gradient-to-r ${
                           result.rarity === "UR"
-                            ? "from-fuchsia-300 via-amber-200 to-cyan-300"
+                            ? "from-fuchsia-300 via-amber-200 to-cyan-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
+                            : result.rarity === "N"
+                            ? "from-stone-200 via-stone-300 to-stone-400"
                             : result.isGap
-                            ? "from-amber-200 via-yellow-300 to-rose-300"
-                            : "from-amber-100 via-yellow-300 to-amber-500"
-                        } drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]`}
+                            ? "from-amber-200 via-yellow-300 to-rose-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
+                            : "from-amber-100 via-yellow-300 to-amber-500 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
+                        }`}
                       >
                         『{result.suffix}』
                       </span>

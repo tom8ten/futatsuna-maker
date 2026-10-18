@@ -22,29 +22,50 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
   const palette = getAttributePalette(result.attribute);
   const prismLabel = getPrismTypeLabel(result.rarity);
   const stickerNo = String((result.seed % 999) + 1).padStart(3, "0");
+  const isNormal = result.rarity === "N";
 
-  // 同一画像を使う派生系統には色相・彩度フィルターで別カラーバリエーションを付与
-  const imageFilter =
+  // 派生系統の色相バリエーション ＋ レア度別の発色差（Nは彩度を抑えたレトロ紙印刷トーン）
+  const baseHueFilter =
     archetype === "observer"
-      ? "hue-rotate(42deg) saturate(1.2)"
+      ? "hue-rotate(42deg)"
       : archetype === "cat_servant"
-      ? "hue-rotate(310deg) saturate(1.18)"
+      ? "hue-rotate(310deg)"
       : archetype === "hangaku_hunter"
-      ? "hue-rotate(335deg) contrast(1.08)"
+      ? "hue-rotate(335deg)"
       : archetype === "broke_noble"
-      ? "hue-rotate(35deg) saturate(1.15)"
-      : undefined;
+      ? "hue-rotate(35deg)"
+      : "";
+
+  const rarityToneFilter = isNormal
+    ? "saturate(0.45) contrast(0.88) brightness(0.82) sepia(0.22)"
+    : result.rarity === "R"
+    ? "saturate(1.12) contrast(1.06) brightness(1.03)"
+    : "saturate(1.2) contrast(1.08) brightness(1.05)";
+
+  const imageFilter = `${baseHueFilter} ${rarityToneFilter}`.trim();
+
+  // シール外枠のレア度別スタイル（Nはツヤなしの素朴な紙・石枠、R以上はメタリック＆発光）
+  const outerFrameClass =
+    result.rarity === "UR"
+      ? "ur-rainbow-card shadow-[0_12px_45px_rgba(236,72,153,0.55),0_0_35px_rgba(6,182,212,0.45)]"
+      : result.rarity === "SSR"
+      ? "ssr-gold-card shadow-[0_12px_40px_rgba(251,191,36,0.5)]"
+      : result.rarity === "SR"
+      ? "bg-gradient-to-br from-slate-100 via-purple-300 to-slate-400 shadow-[0_10px_35px_rgba(168,85,247,0.4)]"
+      : result.rarity === "R"
+      ? "bg-gradient-to-br from-sky-200 via-amber-200 to-sky-400 shadow-[0_10px_30px_rgba(56,189,248,0.35)]"
+      : "bg-[#c7bfa8] border border-stone-600 shadow-[0_6px_16px_rgba(0,0,0,0.75)]";
 
   const prismOverlayClass =
     result.rarity === "UR"
-      ? "bikkuriman-prism-ur opacity-40 mix-blend-color-dodge"
+      ? "bikkuriman-prism-ur opacity-45 mix-blend-color-dodge"
       : result.rarity === "SSR"
-      ? "bikkuriman-prism-ssr opacity-35 mix-blend-overlay"
+      ? "bikkuriman-prism-ssr opacity-40 mix-blend-overlay"
       : result.rarity === "SR"
-      ? "bikkuriman-prism-sr opacity-30 mix-blend-overlay"
+      ? "bikkuriman-prism-sr opacity-38 mix-blend-overlay"
       : result.rarity === "R"
-      ? "bikkuriman-prism-r opacity-25 mix-blend-soft-light"
-      : "bikkuriman-prism-n opacity-20";
+      ? "bikkuriman-prism-r opacity-38 mix-blend-overlay"
+      : "bikkuriman-prism-n opacity-30 mix-blend-multiply bg-[#d6cbb5]/25";
 
   return (
     <div className="flex flex-col items-center">
@@ -60,13 +81,7 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
           }
         }}
         aria-label="ビックリマン風シールを裏返す"
-        className={`group relative w-68 h-68 sm:w-80 sm:h-80 rounded-xl p-2 shadow-[0_12px_40px_rgba(0,0,0,0.9),0_0_30px_rgba(251,191,36,0.4)] cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] ${
-          result.rarity === "UR"
-            ? "ur-rainbow-card"
-            : result.rarity === "SSR"
-            ? "ssr-gold-card"
-            : "bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-600"
-        }`}
+        className={`group relative w-68 h-68 sm:w-80 sm:h-80 rounded-xl p-2 cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] ${outerFrameClass}`}
       >
         {!isFlipped ? (
           /* ================= 表面：本格ビックリマン風イラスト＆角プリズム＆袋文字タイトル ================= */
@@ -80,11 +95,13 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
               style={{ filter: imageFilter }}
             />
 
-            {/* レアリティ連動の角プリズム・ホログラム箔押しオーバーレイ */}
+            {/* レアリティ連動のプリズム・紙質感オーバーレイ */}
             <div className={`pointer-events-none absolute inset-0 ${prismOverlayClass}`} />
 
-            {/* 斜めホログラム反射グレア */}
-            <div className="pointer-events-none absolute inset-0 shimmer-effect opacity-90" />
+            {/* 斜めホログラム反射グレア（R以上のキラシールのみ発動、Nはツヤなし） */}
+            {!isNormal && (
+              <div className="pointer-events-none absolute inset-0 shimmer-effect opacity-95" />
+            )}
 
             {/* 上下文字の視認性を高めるグラデーションシェード */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/80 via-black/35 to-transparent" />
@@ -96,38 +113,58 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
                 <span
                   className="text-[10px] sm:text-[11px] font-black px-2 py-0.5 rounded border-2 border-stone-950 shadow-md tracking-tight"
                   style={{
-                    backgroundColor: meta.sealBadgeBg,
-                    color: meta.sealBadgeText,
+                    backgroundColor: isNormal ? "#44403c" : meta.sealBadgeBg,
+                    color: isNormal ? "#e7e5e4" : meta.sealBadgeText,
                   }}
                 >
-                  {meta.categoryLabel}
+                  {isNormal ? "一般シール" : meta.categoryLabel}
                 </span>
 
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded bg-stone-950/95 text-amber-300 border border-amber-400 font-mono shadow">
+                  <span className="text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded bg-stone-950/95 text-stone-300 border border-stone-600 font-mono shadow">
                     No.{stickerNo}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-black px-2 py-0.5 rounded bg-red-600 text-yellow-200 border-2 border-stone-950 shadow-md">
+                  <span
+                    className={`text-[11px] sm:text-xs font-black px-2 py-0.5 rounded border-2 border-stone-950 shadow-md ${
+                      isNormal
+                        ? "bg-stone-600 text-stone-200"
+                        : result.rarity === "R"
+                        ? "bg-sky-600 text-white"
+                        : "bg-red-600 text-yellow-200"
+                    }`}
+                  >
                     {result.rarity}
                   </span>
                 </div>
               </div>
 
               {/* 前半の修飾語リボン */}
-              <div className="bg-stone-950/90 border border-amber-300/90 rounded px-2 py-0.5 text-center shadow-md">
-                <p className="text-[10px] sm:text-xs font-black text-amber-200 truncate">
+              <div
+                className={`rounded px-2 py-0.5 text-center shadow-md ${
+                  isNormal
+                    ? "bg-stone-900/90 border border-stone-500/60"
+                    : "bg-stone-950/90 border border-amber-300/90"
+                }`}
+              >
+                <p
+                  className={`text-[10px] sm:text-xs font-black truncate ${
+                    isNormal ? "text-stone-300" : "text-amber-200"
+                  }`}
+                >
                   {result.prefix}
                 </p>
               </div>
 
-              {/* 後半のメインキャラ名（ビックリマン風 極太袋文字） */}
+              {/* 後半のメインキャラ名（Nは素朴な白文字、R以上は鮮やかな極太袋文字） */}
               <div className="mt-1 text-center">
                 <div
                   className="font-black text-lg sm:text-2xl leading-tight tracking-tighter break-keep"
                   style={{
-                    color: meta.titleColor,
+                    color: isNormal ? "#e7e5e4" : meta.titleColor,
                     WebkitTextStroke: "1.5px #111111",
-                    textShadow: `0 2px 0 #000000, 2px 2px 0 ${meta.titleStroke}, -2px -2px 0 #111111, 2px -2px 0 #111111, -2px 2px 0 #111111, 0 4px 10px rgba(0,0,0,0.85)`,
+                    textShadow: isNormal
+                      ? "0 2px 0 #000000, -1.5px -1.5px 0 #1c1917, 1.5px -1.5px 0 #1c1917, -1.5px 1.5px 0 #1c1917"
+                      : `0 2px 0 #000000, 2px 2px 0 ${meta.titleStroke}, -2px -2px 0 #111111, 2px -2px 0 #111111, -2px 2px 0 #111111, 0 4px 10px rgba(0,0,0,0.85)`,
                   }}
                 >
                   {result.suffix}
@@ -137,13 +174,25 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
 
             {/* 下部：対象者ネームプレート＆戦闘力フッター */}
             <div
-              className="relative z-20 bg-stone-950/95 border-t-2 border-amber-400/80 px-2.5 py-1.5 flex items-center justify-between text-xs"
-              style={{ boxShadow: `0 -4px 16px ${palette.glow}` }}
+              className={`relative z-20 bg-stone-950/95 border-t-2 px-2.5 py-1.5 flex items-center justify-between text-xs ${
+                isNormal ? "border-stone-600" : "border-amber-400/80"
+              }`}
+              style={{ boxShadow: isNormal ? undefined : `0 -4px 16px ${palette.glow}` }}
             >
-              <span className="font-black text-amber-300 truncate max-w-[50%]">
+              <span
+                className={`font-black truncate max-w-[50%] ${
+                  isNormal ? "text-stone-300" : "text-amber-300"
+                }`}
+              >
                 {result.name}
               </span>
-              <span className="font-mono font-black text-yellow-100 bg-gradient-to-r from-red-700 to-amber-700 px-2 py-0.5 rounded border border-amber-300 text-[11px] shadow">
+              <span
+                className={`font-mono font-black px-2 py-0.5 rounded text-[11px] shadow ${
+                  isNormal
+                    ? "bg-stone-800 text-stone-300 border border-stone-600"
+                    : "text-yellow-100 bg-gradient-to-r from-red-700 to-amber-700 border border-amber-300"
+                }`}
+              >
                 戦闘力 {result.combatPowerFormatted}
               </span>
             </div>
@@ -212,8 +261,14 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
 
       {/* シール仕様バッジ＆裏面フリップ案内ボタン */}
       <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2">
-        <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-950/90 border border-amber-500/40 text-amber-300 font-bold flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-amber-400" />
+        <span
+          className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 ${
+            isNormal
+              ? "bg-stone-900 border border-stone-700 text-stone-400"
+              : "bg-amber-950/90 border border-amber-500/40 text-amber-300"
+          }`}
+        >
+          <Sparkles className={`w-3 h-3 ${isNormal ? "text-stone-500" : "text-amber-400"}`} />
           <span>{prismLabel}</span>
         </span>
         <button
@@ -222,7 +277,7 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
           className="text-xs px-3 py-1 rounded-full bg-stone-900 hover:bg-stone-800 border border-amber-400/50 text-amber-200 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
         >
           <RotateCw className="w-3.5 h-3.5 text-amber-400" />
-          <span>{isFlipped ? "シールの表面（キラ絵）に戻す" : "シールを裏返す（裏書きを見る）"}</span>
+          <span>{isFlipped ? "シールの表面（イラスト）に戻す" : "シールを裏返す（裏書きを見る）"}</span>
         </button>
       </div>
     </div>
