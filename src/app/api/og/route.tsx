@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { generateDiagnosis, DiagnosisMode, Rarity } from "@/lib/dictionary";
+import { ARCHETYPE_META, getBikkurimanArchetype } from "@/lib/bikkuriman";
 
 export const runtime = "edge";
 
@@ -96,6 +97,9 @@ export async function GET(req: NextRequest) {
   const isDefault = !rawName.trim();
   const result = generateDiagnosis(isDefault ? "伝説の勇者" : rawName, mode, dateParam);
   const rarityStyle = getRarityStyles(result.rarity);
+  const archetype = getBikkurimanArchetype(result.suffix, result.isGap, result.seed);
+  const archetypeMeta = ARCHETYPE_META[archetype];
+  const stickerImgUrl = new URL(archetypeMeta.imageSrc, req.url).toString();
 
   // 描画する全文字列を集めてGoogle Fontsからサブセットを取得
   const textToLoad = Array.from(
@@ -138,7 +142,7 @@ export async function GET(req: NextRequest) {
             height: "100%",
             border: `3px solid ${rarityStyle.borderColor}`,
             borderRadius: "18px",
-            padding: "30px 42px",
+            padding: "26px 38px",
             backgroundColor: "rgba(12, 10, 9, 0.85)",
             boxShadow: `0 0 50px ${rarityStyle.outerGlow}`,
             position: "relative",
@@ -152,7 +156,7 @@ export async function GET(req: NextRequest) {
               alignItems: "center",
               width: "100%",
               borderBottom: "1px solid rgba(217, 119, 6, 0.4)",
-              paddingBottom: "14px",
+              paddingBottom: "12px",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
@@ -235,54 +239,94 @@ export async function GET(req: NextRequest) {
             </div>
           </div>
 
-          {/* メイン：生成された二つ名（前半修飾語＋後半二つ名の2段構成） */}
+          {/* メイン：ビックリマン風キラシール ＋ 生成された二つ名 */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              padding: "16px 24px",
-              margin: "8px 0",
+              gap: "28px",
+              padding: "14px 28px",
+              margin: "6px 0",
               backgroundColor: "rgba(28, 25, 23, 0.78)",
               border: "1px solid rgba(251, 191, 36, 0.35)",
               borderRadius: "14px",
             }}
           >
+            {/* 左：ビックリマン風キラシール画像 */}
             <div
               style={{
                 display: "flex",
-                fontSize: "18px",
-                color: "#a8a29e",
-                marginBottom: "4px",
-                letterSpacing: "0.12em",
+                width: "162px",
+                height: "162px",
+                padding: "5px",
+                borderRadius: "14px",
+                background: "linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #b45309 100%)",
+                boxShadow: "0 8px 25px rgba(0, 0, 0, 0.8)",
+                flexShrink: 0,
               }}
             >
-              ― 覚醒せし魂の称号 ―
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={stickerImgUrl}
+                alt={result.suffix}
+                width={152}
+                height={152}
+                style={{
+                  width: "152px",
+                  height: "152px",
+                  borderRadius: "10px",
+                  border: "2px solid #090807",
+                  objectFit: "cover",
+                }}
+              />
             </div>
+
+            {/* 右：前半修飾語＋後半二つ名の2段構成 */}
             <div
               style={{
                 display: "flex",
-                fontSize: "32px",
-                fontWeight: 700,
-                color: "#fde68a",
-                marginBottom: "2px",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1,
               }}
             >
-              {result.prefix}
-            </div>
-            <div
-              style={{
-                display: "flex",
-                fontSize: result.suffix.length > 12 ? "48px" : "56px",
-                fontWeight: 900,
-                color: rarityStyle.accentColor,
-                textAlign: "center",
-                lineHeight: 1.18,
-                textShadow: "0 4px 24px rgba(245, 158, 11, 0.45)",
-              }}
-            >
-              『{result.suffix}』
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: "18px",
+                  color: "#a8a29e",
+                  marginBottom: "4px",
+                  letterSpacing: "0.12em",
+                }}
+              >
+                ― 覚醒せし魂の称号 ―
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: "30px",
+                  fontWeight: 700,
+                  color: "#fde68a",
+                  marginBottom: "2px",
+                }}
+              >
+                {result.prefix}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: result.suffix.length > 12 ? "44px" : "52px",
+                  fontWeight: 900,
+                  color: rarityStyle.accentColor,
+                  textAlign: "center",
+                  lineHeight: 1.18,
+                  textShadow: "0 4px 24px rgba(245, 158, 11, 0.45)",
+                }}
+              >
+                『{result.suffix}』
+              </div>
             </div>
           </div>
 

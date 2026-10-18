@@ -22,6 +22,7 @@ export interface ArchetypeMeta {
   id: BikkurimanArchetype;
   categoryLabel: string; // ヘッド / 天使 / 悪魔 / お守り / 珍聖
   archetypeName: string; // 系統名
+  imageSrc: string; // ビックリマン風本格イラスト画像パス
   sealBadgeBg: string;
   sealBadgeText: string;
   titleColor: string;
@@ -30,7 +31,7 @@ export interface ArchetypeMeta {
 
 /**
  * 後半の名詞（COOL_SUFFIXES 48種 + GAP_SUFFIXES 45種）から
- * 16種類のビックリマン風2頭身キャラ系統への決定論的マッピング
+ * ビックリマン風キャラ系統への決定論的マッピング
  */
 export function getBikkurimanArchetype(
   suffix: string,
@@ -186,12 +187,9 @@ export function getBikkurimanArchetype(
   const gapFallbacks: BikkurimanArchetype[] = [
     "teiji_dash",
     "futon_sage",
-    "cat_servant",
-    "hangaku_hunter",
     "caffeine_addict",
     "digital_cursed",
     "ouch_sinner",
-    "broke_noble",
   ];
   return gapFallbacks[seed % gapFallbacks.length];
 }
@@ -201,6 +199,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "paladin",
     categoryLabel: "聖騎士ヘッド",
     archetypeName: "天界聖剣系",
+    imageSrc: "/stickers/paladin.jpg",
     sealBadgeBg: "#dc2626",
     sealBadgeText: "#fef08a",
     titleColor: "#fde047",
@@ -210,6 +209,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "demon_lord",
     categoryLabel: "魔界ヘッド",
     archetypeName: "暗黒覇王系",
+    imageSrc: "/stickers/demon_lord.jpg",
     sealBadgeBg: "#581c87",
     sealBadgeText: "#f0abfc",
     titleColor: "#fde047",
@@ -219,6 +219,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "archmage",
     categoryLabel: "魔導ヘッド",
     archetypeName: "大賢者・星詠み系",
+    imageSrc: "/stickers/archmage.jpg",
     sealBadgeBg: "#1e3a8a",
     sealBadgeText: "#93c5fd",
     titleColor: "#fef08a",
@@ -228,6 +229,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "reaper",
     categoryLabel: "冥界悪魔",
     archetypeName: "死神・執行者系",
+    imageSrc: "/stickers/reaper.jpg",
     sealBadgeBg: "#18181b",
     sealBadgeText: "#e879f9",
     titleColor: "#f0abfc",
@@ -237,6 +239,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "dragoon",
     categoryLabel: "武神ヘッド",
     archetypeName: "竜騎士・狂戦士系",
+    imageSrc: "/stickers/dragoon.jpg",
     sealBadgeBg: "#991b1b",
     sealBadgeText: "#fca5a5",
     titleColor: "#fde047",
@@ -246,6 +249,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "vampire",
     categoryLabel: "夜魔ヘッド",
     archetypeName: "堕天使・吸血鬼系",
+    imageSrc: "/stickers/vampire.jpg",
     sealBadgeBg: "#881337",
     sealBadgeText: "#fda4af",
     titleColor: "#fecdd3",
@@ -255,6 +259,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "alchemist",
     categoryLabel: "機巧お守り",
     archetypeName: "錬金術・機神系",
+    imageSrc: "/stickers/alchemist.jpg",
     sealBadgeBg: "#065f46",
     sealBadgeText: "#6ee7b7",
     titleColor: "#fde047",
@@ -264,6 +269,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "observer",
     categoryLabel: "超聖神",
     archetypeName: "時空超越・観測者系",
+    imageSrc: "/stickers/archmage.jpg",
     sealBadgeBg: "#0c4a6e",
     sealBadgeText: "#7dd3fc",
     titleColor: "#fef08a",
@@ -273,6 +279,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "teiji_dash",
     categoryLabel: "社畜珍聖",
     archetypeName: "定時退社・有給神系",
+    imageSrc: "/stickers/teiji_dash.jpg",
     sealBadgeBg: "#0284c7",
     sealBadgeText: "#fef08a",
     titleColor: "#fef08a",
@@ -282,6 +289,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "futon_sage",
     categoryLabel: "安眠お守り",
     archetypeName: "二度寝・お布団結界系",
+    imageSrc: "/stickers/futon_sage.jpg",
     sealBadgeBg: "#4f46e5",
     sealBadgeText: "#e0e7ff",
     titleColor: "#fde047",
@@ -291,6 +299,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "cat_servant",
     categoryLabel: "尊いお守り",
     archetypeName: "猫の下僕・推し活系",
+    imageSrc: "/stickers/futon_sage.jpg",
     sealBadgeBg: "#db2777",
     sealBadgeText: "#fce7f3",
     titleColor: "#fef08a",
@@ -300,6 +309,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "hangaku_hunter",
     categoryLabel: "爆食悪魔",
     archetypeName: "半額ハンター・深夜麺系",
+    imageSrc: "/stickers/caffeine_addict.jpg",
     sealBadgeBg: "#dc2626",
     sealBadgeText: "#fef08a",
     titleColor: "#fde047",
@@ -309,6 +319,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "caffeine_addict",
     categoryLabel: "覚醒お守り",
     archetypeName: "カフェイン・整い系",
+    imageSrc: "/stickers/caffeine_addict.jpg",
     sealBadgeBg: "#d97706",
     sealBadgeText: "#fffbeb",
     titleColor: "#fef08a",
@@ -318,6 +329,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "digital_cursed",
     categoryLabel: "電波悪魔",
     archetypeName: "充電2%・通信受難系",
+    imageSrc: "/stickers/digital_cursed.jpg",
     sealBadgeBg: "#0f766e",
     sealBadgeText: "#99f6e4",
     titleColor: "#5eead4",
@@ -327,6 +339,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "ouch_sinner",
     categoryLabel: "哀愁お守り",
     archetypeName: "腰痛・うっかり受難系",
+    imageSrc: "/stickers/ouch_sinner.jpg",
     sealBadgeBg: "#7c2d12",
     sealBadgeText: "#fed7aa",
     titleColor: "#fde047",
@@ -336,6 +349,7 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     id: "broke_noble",
     categoryLabel: "金欠悪魔",
     archetypeName: "サブスク貴族・ギリギリ系",
+    imageSrc: "/stickers/ouch_sinner.jpg",
     sealBadgeBg: "#713f12",
     sealBadgeText: "#fef08a",
     titleColor: "#fde047",
@@ -366,7 +380,6 @@ export function getAttributePalette(attribute: string): {
   if (attribute.includes("時空") || attribute.includes("幻影")) {
     return { primary: "#a855f7", secondary: "#ec4899", glow: "rgba(168,85,247,0.6)" };
   }
-  // 深淵・虚空・混沌など
   return { primary: "#9333ea", secondary: "#ef4444", glow: "rgba(147,51,234,0.6)" };
 }
 
