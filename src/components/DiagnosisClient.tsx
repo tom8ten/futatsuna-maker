@@ -401,39 +401,46 @@ export default function DiagnosisClient({
                       ― 覚醒せし魂の二つ名 ―
                     </p>
 
-                    <div className="font-black tracking-tight leading-snug break-words max-w-full">
-                      <span
-                        className={`block mb-1.5 font-bold break-words ${
-                          result.prefix.length >= 15
-                            ? "text-sm sm:text-xl md:text-2xl"
-                            : "text-base sm:text-2xl md:text-3xl"
-                        } ${
-                          result.rarity === "N" ? "text-stone-400" : "text-amber-200/90"
-                        }`}
-                      >
-                        {result.prefix}
-                      </span>
-                      <span
-                        className={`inline-block max-w-full break-words bg-clip-text text-transparent bg-gradient-to-r ${
-                          result.suffix.length >= 18
-                            ? "text-base sm:text-2xl md:text-3xl"
-                            : result.suffix.length >= 14
-                            ? "text-lg sm:text-3xl md:text-4xl"
-                            : result.suffix.length >= 10
-                            ? "text-xl sm:text-3xl md:text-4xl"
-                            : "text-2xl sm:text-4xl md:text-5xl"
-                        } ${
-                          result.rarity === "UR"
-                            ? "from-fuchsia-300 via-amber-200 to-cyan-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
-                            : result.rarity === "N"
-                            ? "from-stone-200 via-stone-300 to-stone-400"
-                            : result.isGap
-                            ? "from-amber-200 via-yellow-300 to-rose-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
-                            : "from-amber-100 via-yellow-300 to-amber-500 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
-                        }`}
-                      >
-                        『{result.suffix}』
-                      </span>
+                    <div className="max-w-xl mx-auto p-3.5 sm:p-5 rounded-xl border border-amber-500/40 bg-stone-950/80 shadow-lg font-black tracking-tight leading-snug break-words">
+                      {/* 1段目：冠修飾語 */}
+                      <div className="pb-1.5 mb-2 border-b border-amber-500/20">
+                        <span
+                          className={`block font-bold break-words ${
+                            result.prefix.length >= 15
+                              ? "text-sm sm:text-xl md:text-2xl"
+                              : "text-base sm:text-2xl md:text-3xl"
+                          } ${
+                            result.rarity === "N" ? "text-stone-400" : "text-amber-200/90"
+                          }`}
+                        >
+                          {result.prefix}
+                        </span>
+                      </div>
+
+                      {/* 2段目：メイン二つ名 */}
+                      <div>
+                        <span
+                          className={`inline-block max-w-full break-words bg-clip-text text-transparent bg-gradient-to-r ${
+                            result.suffix.length >= 18
+                              ? "text-base sm:text-2xl md:text-3xl"
+                              : result.suffix.length >= 14
+                              ? "text-lg sm:text-3xl md:text-4xl"
+                              : result.suffix.length >= 10
+                              ? "text-xl sm:text-3xl md:text-4xl"
+                              : "text-2xl sm:text-4xl md:text-5xl"
+                          } ${
+                            result.rarity === "UR"
+                              ? "from-fuchsia-300 via-amber-200 to-cyan-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
+                              : result.rarity === "N"
+                              ? "from-stone-200 via-stone-300 to-stone-400"
+                              : result.isGap
+                              ? "from-amber-200 via-yellow-300 to-rose-300 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
+                              : "from-amber-100 via-yellow-300 to-amber-500 drop-shadow-[0_2px_18px_rgba(251,191,36,0.35)]"
+                          }`}
+                        >
+                          『{result.suffix}』
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

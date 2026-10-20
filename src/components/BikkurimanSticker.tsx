@@ -14,6 +14,94 @@ interface BikkurimanStickerProps {
   result: DiagnosisResult;
 }
 
+/**
+ * シール表面の二つ名（修飾語＋メイン称号）を視認性高く美麗に描画するヘルパー
+ */
+function renderStickerTitle(
+  prefix: string,
+  suffix: string,
+  isNormal: boolean
+) {
+  // 括弧付きの二つ名（例: 聖騎士（パラディン）、死神（リーパー）、次元旅人（ディメンションウォーカー））
+  const parenMatch = suffix.match(/^(.*?)[（(](.*?)[）)]$/);
+
+  // 漢字の潰れを防ぐ8方向の外周シャドウアウトライン（-webkit-text-strokeの代替）
+  const shadowOutline = isNormal
+    ? "0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 2px 4px rgba(0,0,0,0.95)"
+    : "0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 6px rgba(251,191,36,0.65), 0 2px 4px rgba(0,0,0,0.95)";
+
+  const titleColor = isNormal ? "#f5f5f4" : "#fef08a";
+
+  return (
+    <div
+      className={`relative mt-1 px-2 py-1 sm:py-1.5 rounded-lg border-2 text-center shadow-[0_4px_16px_rgba(0,0,0,0.9)] backdrop-blur-[3px] transition-all ${
+        isNormal
+          ? "bg-stone-950/92 border-stone-500/80"
+          : "bg-gradient-to-b from-stone-950/95 via-[#18130d]/95 to-stone-950/95 border-amber-400/90 shadow-[0_0_14px_rgba(245,158,11,0.38)]"
+      }`}
+    >
+      {/* 1段目：冠修飾語 */}
+      <div className="flex items-center justify-center pb-0.5 border-b border-amber-500/25">
+        <span
+          className={`text-[9px] sm:text-[11px] font-black tracking-tight leading-tight line-clamp-1 ${
+            isNormal ? "text-stone-300" : "text-amber-300"
+          }`}
+          style={{
+            textShadow: "0 1px 2px #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000",
+          }}
+        >
+          {prefix}
+        </span>
+      </div>
+
+      {/* 2段目：メイン二つ名（同じ枠の2段目として一体配置） */}
+      <div className="pt-1 flex flex-col items-center justify-center">
+        {parenMatch ? (
+          <div className="flex flex-col items-center justify-center leading-tight">
+            <span
+              className="font-black text-sm sm:text-base md:text-lg tracking-tight"
+              style={{
+                color: titleColor,
+                textShadow: shadowOutline,
+              }}
+            >
+              {parenMatch[1]}
+            </span>
+            <span
+              className={`font-black text-[10px] sm:text-[11px] tracking-tight leading-none mt-0.5 ${
+                isNormal ? "text-stone-300" : "text-amber-200"
+              }`}
+              style={{
+                textShadow: shadowOutline,
+              }}
+            >
+              （{parenMatch[2]}）
+            </span>
+          </div>
+        ) : (
+          <span
+            className={`font-black leading-tight tracking-tight break-words max-w-full ${
+              suffix.length <= 4
+                ? "text-base sm:text-xl"
+                : suffix.length <= 7
+                ? "text-sm sm:text-lg"
+                : suffix.length <= 11
+                ? "text-xs sm:text-base"
+                : "text-[11px] sm:text-sm"
+            }`}
+            style={{
+              color: titleColor,
+              textShadow: shadowOutline,
+            }}
+          >
+            {suffix}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -104,11 +192,11 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
             )}
 
             {/* 上下文字の視認性を高めるグラデーションシェード */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/80 via-black/35 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/90 via-black/55 to-transparent" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
 
-            {/* 上部：種族バッジ・シールNo・二つ名袋文字ロゴ */}
-            <div className="relative z-20 px-2.5 pt-2">
+            {/* 上部：種族バッジ・シールNo・二つ名ネームプレート */}
+            <div className="relative z-20 px-2 pt-2">
               <div className="flex items-center justify-between gap-1 mb-1">
                 <span
                   className="text-[10px] sm:text-[11px] font-black px-2 py-0.5 rounded border-2 border-stone-950 shadow-md tracking-tight"
@@ -138,52 +226,8 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
                 </div>
               </div>
 
-              {/* 前半の修飾語リボン */}
-              <div
-                className={`rounded px-1.5 py-0.5 text-center shadow-md overflow-hidden ${
-                  isNormal
-                    ? "bg-stone-900/90 border border-stone-500/60"
-                    : "bg-stone-950/90 border border-amber-300/90"
-                }`}
-              >
-                <p
-                  className={`${
-                    result.prefix.length >= 15
-                      ? "text-[9px] sm:text-[11px]"
-                      : "text-[10px] sm:text-xs"
-                  } font-black leading-tight break-words ${
-                    isNormal ? "text-stone-300" : "text-amber-200"
-                  }`}
-                >
-                  {result.prefix}
-                </p>
-              </div>
-
-              {/* 後半のメインキャラ名（文字数に応じて自動縮小し枠内に収める） */}
-              <div className="mt-1 text-center px-0.5 overflow-hidden">
-                <div
-                  className={`font-black leading-tight tracking-tighter break-words ${
-                    result.suffix.length >= 18
-                      ? "text-[11px] sm:text-[13px]"
-                      : result.suffix.length >= 15
-                      ? "text-xs sm:text-sm"
-                      : result.suffix.length >= 12
-                      ? "text-sm sm:text-base"
-                      : result.suffix.length >= 10
-                      ? "text-base sm:text-xl"
-                      : "text-lg sm:text-2xl"
-                  }`}
-                  style={{
-                    color: isNormal ? "#e7e5e4" : meta.titleColor,
-                    WebkitTextStroke: result.suffix.length >= 15 ? "1px #111111" : "1.5px #111111",
-                    textShadow: isNormal
-                      ? "0 2px 0 #000000, -1.5px -1.5px 0 #1c1917, 1.5px -1.5px 0 #1c1917, -1.5px 1.5px 0 #1c1917"
-                      : `0 2px 0 #000000, 2px 2px 0 ${meta.titleStroke}, -2px -2px 0 #111111, 2px -2px 0 #111111, -2px 2px 0 #111111, 0 4px 10px rgba(0,0,0,0.85)`,
-                  }}
-                >
-                  {result.suffix}
-                </div>
-              </div>
+              {/* 二つ名ネームプレート（高コントラスト＆ビックリマン風デザイン） */}
+              {renderStickerTitle(result.prefix, result.suffix, isNormal)}
             </div>
 
             {/* 下部：対象者ネームプレート＆戦闘力フッター */}
@@ -227,7 +271,7 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
                 </div>
 
                 {/* ミニキャラアイコン＋二つ名 */}
-                <div className="mt-2 flex items-center gap-2 bg-blue-950 text-yellow-200 rounded p-1.5">
+                <div className="mt-2 flex items-center gap-2 bg-blue-950 text-yellow-200 rounded p-1.5 border border-blue-900/60 shadow-sm">
                   <div className="w-11 h-11 rounded border border-amber-300 overflow-hidden shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -238,10 +282,10 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
                     />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
-                    <div className="text-[10px] text-amber-300 font-bold truncate">
+                    <div className="text-[10px] sm:text-[11px] text-amber-300 font-bold leading-tight break-words">
                       {result.prefix}
                     </div>
-                    <div className="text-xs sm:text-sm font-black leading-tight truncate">
+                    <div className="text-xs sm:text-sm font-black text-yellow-100 leading-snug break-words mt-0.5">
                       {result.suffix}
                     </div>
                   </div>
