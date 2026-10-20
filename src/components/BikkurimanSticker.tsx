@@ -169,7 +169,7 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
           }
         }}
         aria-label="ビックリマン風シールを裏返す"
-        className={`group relative w-68 h-68 sm:w-80 sm:h-80 rounded-xl p-2 cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] ${outerFrameClass}`}
+        className={`group relative w-72 h-72 sm:w-80 sm:h-80 rounded-xl p-1.5 sm:p-2 cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] ${outerFrameClass}`}
       >
         {!isFlipped ? (
           /* ================= 表面：本格ビックリマン風イラスト＆角プリズム＆袋文字タイトル ================= */
@@ -249,22 +249,22 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
           </div>
         ) : (
           /* ================= 裏面：当時のビックリマン「悪魔VS天使シール 裏書き」風デザイン ================= */
-          <div className="relative w-full h-full rounded-lg border-[3px] border-blue-950 bg-[#fef9c3] text-blue-950 p-3 flex flex-col justify-between overflow-hidden">
+          <div className="relative w-full h-full rounded-lg border-[3px] border-blue-950 bg-[#fef9c3] text-blue-950 p-1.5 sm:p-2.5 flex flex-col justify-between overflow-hidden">
             {/* レトロ印刷の内枠 */}
-            <div className="border-2 border-red-600 rounded h-full p-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between border-b-2 border-blue-900 pb-1">
-                  <span className="text-[10px] font-black bg-red-600 text-yellow-100 px-1.5 py-0.5 rounded">
+            <div className="border-2 border-red-600 rounded h-full p-1.5 sm:p-2 flex flex-col justify-between overflow-hidden">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between border-b border-blue-900/40 pb-0.5">
+                  <span className="text-[9px] sm:text-[10px] font-black bg-red-600 text-yellow-100 px-1.5 py-0.5 rounded">
                     悪魔VS天使 二つ名シール
                   </span>
-                  <span className="text-xs font-mono font-black text-blue-900">
+                  <span className="text-[10px] sm:text-xs font-mono font-black text-blue-900">
                     No.{stickerNo} [{result.rarity}]
                   </span>
                 </div>
 
                 {/* ミニキャラアイコン＋二つ名 */}
-                <div className="mt-2 flex items-center gap-2 bg-blue-950 text-yellow-200 rounded p-1.5 border border-blue-900/60 shadow-sm">
-                  <div className="w-11 h-11 rounded border border-amber-300 overflow-hidden shrink-0">
+                <div className="flex items-center gap-1.5 bg-blue-950 text-yellow-200 rounded p-1 sm:p-1.5">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded border border-amber-300 overflow-hidden shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={meta.imageSrc}
@@ -274,33 +274,38 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
                     />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
-                    <div className="text-[10px] sm:text-[11px] text-amber-300 font-bold leading-tight break-words">
+                    <div className="text-[9px] sm:text-[10px] text-amber-300 font-bold leading-none truncate">
                       {result.prefix}
                     </div>
-                    <div className="text-xs sm:text-sm font-black text-yellow-100 leading-snug break-words mt-0.5">
+                    <div className="text-[11px] sm:text-xs font-black text-yellow-200 leading-tight truncate mt-0.5">
                       {result.suffix}
                     </div>
                   </div>
                 </div>
 
                 {/* 必殺スキル解説 */}
-                <div className="mt-2 bg-yellow-100 border border-blue-900/40 rounded p-1.5 text-[11px] leading-snug text-left">
-                  <div className="font-black text-red-700">
+                <div className="bg-yellow-100 border border-blue-900/40 rounded p-1 sm:p-1.5 text-left">
+                  <div className="font-black text-red-700 text-[10px] sm:text-[11px] leading-tight">
                     ★ 必殺技：【{result.skill.name}】
                   </div>
-                  <p className="text-blue-950 mt-0.5 text-[10px] font-medium">
+                  <p className="text-blue-950 mt-0.5 text-[9px] sm:text-[10px] font-medium leading-tight line-clamp-2">
                     {result.skill.description}
+                  </p>
+                </div>
+
+                {/* 魔導ウワサ欄（ビックリマン裏面の「ウワサ」パロディ） */}
+                <div className="bg-red-50 border border-dashed border-red-600 rounded p-1 sm:p-1.5 text-left">
+                  <div className="font-black text-red-700 text-[9px] sm:text-[10px] leading-tight">
+                    【魔界のウワサ】
+                  </div>
+                  <p className="text-stone-900 font-bold text-[9px] sm:text-[10px] leading-tight mt-0.5 line-clamp-3 sm:line-clamp-none">
+                    {result.flavorText}
                   </p>
                 </div>
               </div>
 
-              {/* 魔導ウワサ欄（ビックリマン裏面の「ウワサ」パロディ） */}
-              <div className="bg-red-50 border-2 border-dashed border-red-600 rounded p-1.5 text-[10px] leading-snug text-left">
-                <span className="font-black text-red-700 mr-1">【魔界のウワサ】</span>
-                <span className="text-stone-900 font-semibold">{result.flavorText}</span>
-              </div>
-
-              <div className="flex items-center justify-between text-[10px] font-bold text-blue-900 pt-1 border-t border-blue-900/30">
+              {/* フッター */}
+              <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold text-blue-900 pt-1 border-t border-blue-900/30">
                 <span>系統：{meta.archetypeName}</span>
                 <span>属性：{result.attribute}</span>
               </div>
