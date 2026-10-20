@@ -25,7 +25,7 @@ function renderStickerTitle(
   // 括弧付きの二つ名（例: 聖騎士（パラディン）、死神（リーパー）、次元旅人（ディメンションウォーカー））
   const parenMatch = suffix.match(/^(.*?)[（(](.*?)[）)]$/);
 
-  // 漢字の潰れを防ぐ8方向の外周シャドウアウトライン（-webkit-text-strokeの代替）
+  // 漢字の潰れを防ぐ8方向の外周シャドウアウトライン
   const shadowOutline = isNormal
     ? "0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 2px 4px rgba(0,0,0,0.95)"
     : "0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 6px rgba(251,191,36,0.65), 0 2px 4px rgba(0,0,0,0.95)";
@@ -34,16 +34,16 @@ function renderStickerTitle(
 
   return (
     <div
-      className={`relative mt-1 px-2 py-1 sm:py-1.5 rounded-lg border-2 text-center shadow-[0_4px_16px_rgba(0,0,0,0.9)] backdrop-blur-[3px] transition-all ${
+      className={`relative z-20 px-2 py-1 text-center border-b shadow-md backdrop-blur-[2px] transition-all ${
         isNormal
-          ? "bg-stone-950/92 border-stone-500/80"
-          : "bg-gradient-to-b from-stone-950/95 via-[#18130d]/95 to-stone-950/95 border-amber-400/90 shadow-[0_0_14px_rgba(245,158,11,0.38)]"
+          ? "bg-stone-950/82 border-stone-600"
+          : "bg-gradient-to-b from-[#18130d]/88 via-[#120e0a]/85 to-[#18130d]/88 border-amber-400/80 shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
       }`}
     >
-      {/* 1段目：冠修飾語 */}
-      <div className="flex items-center justify-center pb-0.5 border-b border-amber-500/25">
+      {/* 1段目：冠修飾語（コンパクトに配置しイラストの視界を確保） */}
+      <div className="flex items-center justify-center">
         <span
-          className={`text-[9px] sm:text-[11px] font-black tracking-tight leading-tight line-clamp-1 ${
+          className={`text-[9px] sm:text-[10px] font-black tracking-tight leading-none line-clamp-1 ${
             isNormal ? "text-stone-300" : "text-amber-300"
           }`}
           style={{
@@ -54,12 +54,12 @@ function renderStickerTitle(
         </span>
       </div>
 
-      {/* 2段目：メイン二つ名（同じ枠の2段目として一体配置） */}
-      <div className="pt-1 flex flex-col items-center justify-center">
+      {/* 2段目：メイン二つ名（同じ枠の2段目としてスマートに配置） */}
+      <div className="mt-0.5 flex flex-col items-center justify-center">
         {parenMatch ? (
-          <div className="flex flex-col items-center justify-center leading-tight">
+          <div className="flex items-center justify-center gap-1 leading-tight flex-wrap">
             <span
-              className="font-black text-sm sm:text-base md:text-lg tracking-tight"
+              className="font-black text-xs sm:text-sm tracking-tight"
               style={{
                 color: titleColor,
                 textShadow: shadowOutline,
@@ -68,7 +68,7 @@ function renderStickerTitle(
               {parenMatch[1]}
             </span>
             <span
-              className={`font-black text-[10px] sm:text-[11px] tracking-tight leading-none mt-0.5 ${
+              className={`font-black text-[9px] sm:text-[10px] tracking-tight leading-none ${
                 isNormal ? "text-stone-300" : "text-amber-200"
               }`}
               style={{
@@ -81,13 +81,13 @@ function renderStickerTitle(
         ) : (
           <span
             className={`font-black leading-tight tracking-tight break-words max-w-full ${
-              suffix.length <= 4
-                ? "text-base sm:text-xl"
-                : suffix.length <= 7
-                ? "text-sm sm:text-lg"
-                : suffix.length <= 11
-                ? "text-xs sm:text-base"
-                : "text-[11px] sm:text-sm"
+              suffix.length <= 5
+                ? "text-sm sm:text-base"
+                : suffix.length <= 8
+                ? "text-xs sm:text-sm"
+                : suffix.length <= 12
+                ? "text-[11px] sm:text-xs"
+                : "text-[10px] sm:text-[11px]"
             }`}
             style={{
               color: titleColor,
@@ -191,15 +191,19 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
               <div className="pointer-events-none absolute inset-0 shimmer-effect opacity-95" />
             )}
 
-            {/* 上下文字の視認性を高めるグラデーションシェード */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/90 via-black/55 to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+            {/* 上部：高コントラスト二つ名ネームプレート（コンパクト化してイラスト全景を魅せる） */}
+            {renderStickerTitle(result.prefix, result.suffix, isNormal)}
 
-            {/* 上部：種族バッジ・シールNo・二つ名ネームプレート */}
-            <div className="relative z-20 px-2 pt-2">
-              <div className="flex items-center justify-between gap-1 mb-1">
+            {/* 下部：種族バッジ＋No＋対象者ネーム＋戦闘力（1行に集約しイラストの可視面積を最大化） */}
+            <div
+              className={`relative z-20 bg-stone-950/88 backdrop-blur-[2px] border-t px-2 py-1 flex items-center justify-between text-xs ${
+                isNormal ? "border-stone-600" : "border-amber-400/80"
+              }`}
+              style={{ boxShadow: isNormal ? undefined : `0 -2px 10px ${palette.glow}` }}
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
                 <span
-                  className="text-[10px] sm:text-[11px] font-black px-2 py-0.5 rounded border-2 border-stone-950 shadow-md tracking-tight"
+                  className="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded border border-stone-950 shadow-sm shrink-0"
                   style={{
                     backgroundColor: isNormal ? "#44403c" : meta.sealBadgeBg,
                     color: isNormal ? "#e7e5e4" : meta.sealBadgeText,
@@ -207,52 +211,40 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
                 >
                   {isNormal ? "一般シール" : meta.categoryLabel}
                 </span>
-
-                <div className="flex items-center gap-1">
-                  <span className="text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded bg-stone-950/95 text-stone-300 border border-stone-600 font-mono shadow">
-                    No.{stickerNo}
-                  </span>
-                  <span
-                    className={`text-[11px] sm:text-xs font-black px-2 py-0.5 rounded border-2 border-stone-950 shadow-md ${
-                      isNormal
-                        ? "bg-stone-600 text-stone-200"
-                        : result.rarity === "R"
-                        ? "bg-sky-600 text-white"
-                        : "bg-red-600 text-yellow-200"
-                    }`}
-                  >
-                    {result.rarity}
-                  </span>
-                </div>
+                <span
+                  className={`font-black truncate text-[11px] sm:text-xs ${
+                    isNormal ? "text-stone-300" : "text-amber-300"
+                  }`}
+                >
+                  {result.name}
+                </span>
               </div>
 
-              {/* 二つ名ネームプレート（高コントラスト＆ビックリマン風デザイン） */}
-              {renderStickerTitle(result.prefix, result.suffix, isNormal)}
-            </div>
-
-            {/* 下部：対象者ネームプレート＆戦闘力フッター */}
-            <div
-              className={`relative z-20 bg-stone-950/95 border-t-2 px-2.5 py-1.5 flex items-center justify-between text-xs ${
-                isNormal ? "border-stone-600" : "border-amber-400/80"
-              }`}
-              style={{ boxShadow: isNormal ? undefined : `0 -4px 16px ${palette.glow}` }}
-            >
-              <span
-                className={`font-black truncate max-w-[50%] ${
-                  isNormal ? "text-stone-300" : "text-amber-300"
-                }`}
-              >
-                {result.name}
-              </span>
-              <span
-                className={`font-mono font-black px-2 py-0.5 rounded text-[11px] shadow ${
-                  isNormal
-                    ? "bg-stone-800 text-stone-300 border border-stone-600"
-                    : "text-yellow-100 bg-gradient-to-r from-red-700 to-amber-700 border border-amber-300"
-                }`}
-              >
-                戦闘力 {result.combatPowerFormatted}
-              </span>
+              <div className="flex items-center gap-1 font-mono shrink-0">
+                <span className="text-[9px] sm:text-[10px] font-black px-1 py-0.5 rounded bg-stone-900 text-stone-300 border border-stone-700">
+                  No.{stickerNo}
+                </span>
+                <span
+                  className={`text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded border border-stone-950 ${
+                    isNormal
+                      ? "bg-stone-600 text-stone-200"
+                      : result.rarity === "R"
+                      ? "bg-sky-600 text-white"
+                      : "bg-red-600 text-yellow-200"
+                  }`}
+                >
+                  {result.rarity}
+                </span>
+                <span
+                  className={`font-mono font-black px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] shadow ${
+                    isNormal
+                      ? "bg-stone-800 text-stone-300 border border-stone-600"
+                      : "text-yellow-100 bg-gradient-to-r from-red-700 to-amber-700 border border-amber-300"
+                  }`}
+                >
+                  戦闘力 {result.combatPowerFormatted}
+                </span>
+              </div>
             </div>
           </div>
         ) : (
