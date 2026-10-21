@@ -1,4 +1,4 @@
-import { Rarity } from "./dictionary";
+import { Rarity, Gender } from "./dictionary";
 
 export type BikkurimanArchetype =
   | "paladin"
@@ -41,26 +41,36 @@ export function getBikkurimanArchetype(
   if (!isGap) {
     if (
       suffix.includes("聖騎士") ||
+      suffix.includes("戦乙女") ||
+      suffix.includes("聖女") ||
+      suffix.includes("姫騎士") ||
       suffix.includes("剣聖") ||
       suffix.includes("英雄") ||
       suffix.includes("騎士団長") ||
       suffix.includes("聖痕") ||
       suffix.includes("黄金律") ||
+      suffix.includes("氷華") ||
       suffix.includes("魔剣士")
     ) {
       return "paladin";
     }
     if (
       suffix.includes("魔王") ||
+      suffix.includes("女帝") ||
       suffix.includes("破壊神") ||
       suffix.includes("覇王") ||
       suffix.includes("皇子") ||
+      suffix.includes("皇女") ||
       suffix.includes("災厄") ||
       suffix.includes("煉獄")
     ) {
       return "demon_lord";
     }
     if (
+      suffix.includes("大魔女") ||
+      suffix.includes("魔女") ||
+      suffix.includes("巫女") ||
+      suffix.includes("歌姫") ||
       suffix.includes("魔導王") ||
       suffix.includes("大賢者") ||
       suffix.includes("星霊術師") ||
@@ -72,10 +82,11 @@ export function getBikkurimanArchetype(
     }
     if (
       suffix.includes("死神") ||
+      suffix.includes("女王") ||
       suffix.includes("執行者") ||
       suffix.includes("影の君主") ||
       suffix.includes("死霊術師") ||
-      suffix.includes("暗殺者") ||
+      suffix.includes("暗殺") ||
       suffix.includes("契約者")
     ) {
       return "reaper";
@@ -84,7 +95,7 @@ export function getBikkurimanArchetype(
       suffix.includes("竜騎士") ||
       suffix.includes("神殺し") ||
       suffix.includes("狂戦士") ||
-      suffix.includes("傭兵王") ||
+      suffix.includes("傭兵") ||
       suffix.includes("銃士") ||
       suffix.includes("幻影騎士")
     ) {
@@ -92,7 +103,7 @@ export function getBikkurimanArchetype(
     }
     if (
       suffix.includes("堕天使") ||
-      suffix.includes("吸血鬼") ||
+      suffix.includes("吸血") ||
       suffix.includes("奏者")
     ) {
       return "vampire";
@@ -101,7 +112,8 @@ export function getBikkurimanArchetype(
       suffix.includes("機関長") ||
       suffix.includes("機巧") ||
       suffix.includes("錬金術師") ||
-      suffix.includes("操縦者")
+      suffix.includes("操縦者") ||
+      suffix.includes("コスメ")
     ) {
       return "alchemist";
     }
@@ -115,7 +127,8 @@ export function getBikkurimanArchetype(
     suffix.includes("VLOOKUP") ||
     suffix.includes("エレベーター") ||
     suffix.includes("再配達") ||
-    suffix.includes("ミュート")
+    suffix.includes("ミュート") ||
+    suffix.includes("韓国ドラマ")
   ) {
     return "teiji_dash";
   }
@@ -125,7 +138,10 @@ export function getBikkurimanArchetype(
     suffix.includes("布団") ||
     suffix.includes("パジャマ") ||
     suffix.includes("アラーム") ||
-    suffix.includes("月曜朝")
+    suffix.includes("月曜朝") ||
+    suffix.includes("前髪") ||
+    suffix.includes("反省会") ||
+    suffix.includes("むくみ")
   ) {
     return "futon_sage";
   }
@@ -139,14 +155,14 @@ export function getBikkurimanArchetype(
     suffix.includes("焼肉") ||
     suffix.includes("カップ麺") ||
     suffix.includes("ペヤング") ||
-    suffix.includes("レジ袋")
+    suffix.includes("レジ袋") ||
+    suffix.includes("スイーツ")
   ) {
     return "hangaku_hunter";
   }
   if (
     suffix.includes("カフェイン") ||
     suffix.includes("ハイボール") ||
-    suffix.includes("スイーツ") ||
     suffix.includes("サウナ")
   ) {
     return "caffeine_addict";
@@ -158,7 +174,8 @@ export function getBikkurimanArchetype(
     suffix.includes("スマホを顔面") ||
     suffix.includes("USB") ||
     suffix.includes("リモコン") ||
-    suffix.includes("イヤホン")
+    suffix.includes("イヤホン") ||
+    suffix.includes("靴下")
   ) {
     return "digital_cursed";
   }
@@ -179,7 +196,8 @@ export function getBikkurimanArchetype(
     suffix.includes("ポイントカード") ||
     suffix.includes("積読") ||
     suffix.includes("サブスク") ||
-    suffix.includes("金欠")
+    suffix.includes("金欠") ||
+    suffix.includes("カート放置")
   ) {
     return "broke_noble";
   }
@@ -356,6 +374,53 @@ export const ARCHETYPE_META: Record<BikkurimanArchetype, ArchetypeMeta> = {
     titleStroke: "#713f12",
   },
 };
+
+const FEMALE_IMAGE_MAP: Record<BikkurimanArchetype, string> = {
+  paladin: "/stickers/female/f-paladin.jpg",
+  demon_lord: "/stickers/female/f-demon_lord.jpg",
+  archmage: "/stickers/female/f-archmage.jpg",
+  reaper: "/stickers/female/f-reaper.jpg",
+  dragoon: "/stickers/female/f-dragoon.jpg",
+  vampire: "/stickers/female/f-vampire.jpg",
+  alchemist: "/stickers/female/f-alchemist.jpg",
+  observer: "/stickers/female/f-archmage.jpg",
+  teiji_dash: "/stickers/female/f-teiji_dash.jpg",
+  futon_sage: "/stickers/female/f-futon_sage.jpg",
+  cat_servant: "/stickers/female/f-futon_sage.jpg",
+  hangaku_hunter: "/stickers/female/f-caffeine_addict.jpg",
+  caffeine_addict: "/stickers/female/f-caffeine_addict.jpg",
+  digital_cursed: "/stickers/female/f-digital_cursed.jpg",
+  ouch_sinner: "/stickers/female/f-ouch_sinner.jpg",
+  broke_noble: "/stickers/female/f-ouch_sinner.jpg",
+};
+
+const FEMALE_CATEGORY_LABEL: Partial<Record<BikkurimanArchetype, string>> = {
+  paladin: "戦乙女ヘッド",
+  demon_lord: "女帝ヘッド",
+  archmage: "大魔女ヘッド",
+  reaper: "冥界女王",
+  dragoon: "竜姫ヘッド",
+  vampire: "夜魔姫",
+  observer: "超聖女",
+};
+
+/**
+ * 性別（男性・女性）に応じたアーキタイプのメタデータ（イラスト画像パス、バッジ名）を取得
+ */
+export function getArchetypeMeta(
+  archetype: BikkurimanArchetype,
+  gender: Gender = "male"
+): ArchetypeMeta {
+  const base = ARCHETYPE_META[archetype];
+  if (gender === "female") {
+    return {
+      ...base,
+      imageSrc: FEMALE_IMAGE_MAP[archetype] || base.imageSrc,
+      categoryLabel: FEMALE_CATEGORY_LABEL[archetype] || base.categoryLabel,
+    };
+  }
+  return base;
+}
 
 /**
  * 属性に応じたビックリマン風オーラカラーパレット

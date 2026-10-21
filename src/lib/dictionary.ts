@@ -2,8 +2,11 @@ export type Rarity = "UR" | "SSR" | "SR" | "R" | "N";
 
 export type DiagnosisMode = "standard" | "daily";
 
+export type Gender = "male" | "female";
+
 export interface DiagnosisResult {
   name: string;
+  gender: Gender;
   mode: DiagnosisMode;
   dateStr?: string;
   seed: number;
@@ -84,9 +87,9 @@ export const PREFIXES: string[] = [
 ];
 
 /**
- * 後半の名詞：85%で選出される「王道のかっこいいワード」（48パターン）
+ * 後半の名詞：男性向け王道のかっこいいワード（48パターン）
  */
-export const COOL_SUFFIXES: string[] = [
+export const COOL_SUFFIXES_MALE: string[] = [
   "聖騎士（パラディン）",
   "契約者（コントラクター）",
   "魔導王",
@@ -138,9 +141,66 @@ export const COOL_SUFFIXES: string[] = [
 ];
 
 /**
- * 後半の名詞：15%で選出される「生活感・哀愁・シュールなギャップワード」（45パターン）
+ * 後半の名詞：女性向け華麗・かっこいいワード（48パターン）
  */
-export const GAP_SUFFIXES: string[] = [
+export const COOL_SUFFIXES_FEMALE: string[] = [
+  "戦乙女（ヴァルキリー）",
+  "聖女",
+  "女帝（エンプレス）",
+  "姫騎士",
+  "大魔女",
+  "冥界の女王",
+  "星詠みの歌姫",
+  "月影の暗殺姫",
+  "竜騎士（ドラグーン）",
+  "白銀の剣聖",
+  "堕天使",
+  "執行者（エクスキューショナー）",
+  "深淵の皇女",
+  "契約者（コントラクター）",
+  "禁忌の錬金術師",
+  "終末の観測者",
+  "死霊術師（ネクロマンサー）",
+  "封印の守護者",
+  "幻影騎士",
+  "天啓の預言者",
+  "蒼焔の銃士",
+  "紅き夜の吸血姫",
+  "黄金律の継承者",
+  "孤高の魔剣士",
+  "終焉の奏者",
+  "破壊神",
+  "聖痕の継承者",
+  "機巧魔術師",
+  "調停者",
+  "審判者（ジャッジメント）",
+  "黒魔導師",
+  "次元旅人（ディメンションウォーカー）",
+  "不滅の英雄",
+  "幻獣の契約主",
+  "虚空の支配者",
+  "漆黒の魔女",
+  "黎明の巫女",
+  "氷華の騎士",
+  "天空の支配者",
+  "煉獄の番人",
+  "神殺し（ゴッドスレイヤー）",
+  "狂戦士（バーサーカー）",
+  "雷光の暗殺姫",
+  "神聖騎士団長",
+  "世界線を渡る観測者",
+  "災厄の化身",
+  "銀狼の傭兵女王",
+  "魔導王",
+];
+
+// 互換性維持
+export const COOL_SUFFIXES = COOL_SUFFIXES_MALE;
+
+/**
+ * 後半の名詞：男性向け生活感・哀愁ギャップワード（45パターン）
+ */
+export const GAP_SUFFIXES_MALE: string[] = [
   "有給消化率100%",
   "猫の下僕",
   "腰椎椎間板ヘルニア",
@@ -187,6 +247,60 @@ export const GAP_SUFFIXES: string[] = [
   "サブスク解約忘れの貴族",
   "年中金欠の錬金術師",
 ];
+
+/**
+ * 後半の名詞：女性向け共感・生活感ギャップワード（45パターン）
+ */
+export const GAP_SUFFIXES_FEMALE: string[] = [
+  "推しの現場全通勢",
+  "前髪のコンディションに一喜一憂せし者",
+  "新作コスメ即買いの錬金術師",
+  "深夜のひとり反省会主催者",
+  "有給消化率100%",
+  "猫の下僕",
+  "半額スイーツハンター",
+  "二度寝の覇者",
+  "カフェイン中毒者",
+  "スマホ充電残り2%",
+  "Wi-Fiルーター再起動係",
+  "布団から出られない者",
+  "サブスク解約忘れの貴族",
+  "改札で引っかかる者",
+  "シャンプー詰め替え失敗者",
+  "傘を電車に忘れし者",
+  "金曜夜の推し活魔神",
+  "月曜朝の絶望体現者",
+  "ポイントカード期限切れ王",
+  "コンビニ新作スイーツ鑑定士",
+  "ExcelのVLOOKUP職人",
+  "エレベーターの閉ボタン連打師",
+  "宅配便の再配達依頼者",
+  "筋肉痛が2日後に来る者",
+  "Passwordを毎回リセットする者",
+  "リモート会議のミュート忘れし者",
+  "家の鍵を閉めたか不安になる者",
+  "レジ袋有料化に未だ抗う者",
+  "休日の昼過ぎまでパジャマの者",
+  "推しのATM",
+  "ポテチを箸で食べる賢者",
+  "サウナの水風呂で整いし者",
+  "目覚ましアラーム5分刻み設定者",
+  "積読タワー建設責任者",
+  "スマホを顔面に落とす者",
+  "エアコンのリモコン捜索隊長",
+  "低気圧に完全敗北せし者",
+  "深夜の韓国ドラマ一気見勢",
+  "洗濯物を干し忘れた大罪人",
+  "イヤホン片方紛失の呪われし者",
+  "年中金欠の錬金術師",
+  "ネット通販のカート放置王",
+  "翌朝のむくみと戦いし者",
+  "靴下片方行方不明の呪われし者",
+  "定時退社のプロ",
+];
+
+// 互換性維持
+export const GAP_SUFFIXES = GAP_SUFFIXES_MALE;
 
 /**
  * 固有スキル一覧（45パターン）
@@ -407,17 +521,25 @@ function calculateCombatPower(rarity: Rarity, randVal: number, isGap: boolean): 
 export function generateDiagnosis(
   rawName: string,
   mode: DiagnosisMode = "standard",
-  dateOverride?: string
+  dateOverride?: string,
+  gender: Gender = "male"
 ): DiagnosisResult {
   // 制御文字を除去し、最大32文字に制限（長大文字列によるDoS対策）
   const sanitizedName = rawName.replace(/[\u0000-\u001F\u007F-\u009F]/g, "").trim().slice(0, 32);
-  const cleanName = sanitizedName || "名無しの冒険者";
+  const cleanName = sanitizedName || (gender === "female" ? "名無しの女騎士" : "名無しの冒険者");
 
   // 日付パラメータは YYYYMMDD の8桁数字のみ許可
   const validDateOverride =
     dateOverride && /^\d{8}$/.test(dateOverride) ? dateOverride : undefined;
   const dateStr = mode === "daily" ? (validDateOverride || getTodayDateString()) : undefined;
-  const seedInput = mode === "daily" ? `${cleanName}::${dateStr}` : cleanName;
+  
+  // シード値生成：男性は既存の後方互換性を完全維持、女性は独立シード
+  const seedInput =
+    mode === "daily"
+      ? `${cleanName}::${gender}::${dateStr}`
+      : gender === "female"
+      ? `${cleanName}::female`
+      : cleanName;
 
   const seed = fnv1aHash(seedInput);
 
@@ -433,9 +555,15 @@ export function generateDiagnosis(
   // 1. 前半の修飾語
   const prefix = PREFIXES[r1 % PREFIXES.length];
 
-  // 2. 後半の名詞（85% 王道 / 15% シュール・ギャップ）
+  // 2. 後半の名詞（85% 王道 / 15% シュール・ギャップ）性別連動
   const isGap = (r2 % 100) < 15;
-  const suffixList = isGap ? GAP_SUFFIXES : COOL_SUFFIXES;
+  const suffixList = isGap
+    ? gender === "female"
+      ? GAP_SUFFIXES_FEMALE
+      : GAP_SUFFIXES_MALE
+    : gender === "female"
+    ? COOL_SUFFIXES_FEMALE
+    : COOL_SUFFIXES_MALE;
   const suffix = suffixList[r3 % suffixList.length];
 
   const fullTitle = `${prefix}${suffix}`;
@@ -461,6 +589,7 @@ export function generateDiagnosis(
 
   return {
     name: cleanName,
+    gender,
     mode,
     dateStr,
     seed,

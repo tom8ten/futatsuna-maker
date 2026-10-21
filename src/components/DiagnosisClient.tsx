@@ -22,6 +22,7 @@ import {
   generateDiagnosis,
   DiagnosisMode,
   DiagnosisResult,
+  Gender,
   RARITY_META,
   buildXShareText,
   getTodayDateString,
@@ -34,6 +35,7 @@ import BikkurimanSticker from "@/components/BikkurimanSticker";
 interface DiagnosisClientProps {
   initialName: string;
   initialMode: DiagnosisMode;
+  initialGender?: Gender;
   initialDate?: string;
   autoShowResult?: boolean;
 }
@@ -41,6 +43,7 @@ interface DiagnosisClientProps {
 export default function DiagnosisClient({
   initialName,
   initialMode,
+  initialGender = "male",
   initialDate,
   autoShowResult = false,
 }: DiagnosisClientProps) {
@@ -48,11 +51,14 @@ export default function DiagnosisClient({
   const [hasUserEdited, setHasUserEdited] = useState(false);
   const isSampleName =
     !hasUserEdited &&
-    (inputName.trim() === "山田太郎" || inputName.trim() === "れいな");
+    (inputName.trim() === "山田太郎" ||
+      inputName.trim() === "佐藤美咲" ||
+      inputName.trim() === "れいな");
   const [mode, setMode] = useState<DiagnosisMode>(initialMode);
+  const [gender, setGender] = useState<Gender>(initialGender);
   const [result, setResult] = useState<DiagnosisResult | null>(() =>
     autoShowResult && initialName.trim()
-      ? generateDiagnosis(initialName, initialMode, initialDate)
+      ? generateDiagnosis(initialName, initialMode, initialDate, initialGender)
       : null
   );
   const [isSummoning, setIsSummoning] = useState(false);
@@ -78,34 +84,45 @@ export default function DiagnosisClient({
   }, []);
 
   // URLクエリパラメータを同期する関数
-  const syncUrlParams = useCallback((targetName: string, targetMode: DiagnosisMode) => {
-    if (typeof window === "undefined") return;
-    const url = new URL(window.location.href);
-    if (targetName.trim()) {
-      url.searchParams.set("name", targetName.trim());
-      if (targetMode === "daily") {
-        url.searchParams.set("mode", "daily");
-        url.searchParams.set("date", getTodayDateString());
+  const syncUrlParams = useCallback(
+    (targetName: string, targetMode: DiagnosisMode, targetGender: Gender) => {
+      if (typeof window === "undefined") return;
+      const url = new URL(window.location.href);
+      if (targetName.trim()) {
+        url.searchParams.set("name", targetName.trim());
+        if (targetGender === "female") {
+          url.searchParams.set("gender", "female");
+        } else {
+          url.searchParams.delete("gender");
+        }
+        if (targetMode === "daily") {
+          url.searchParams.set("mode", "daily");
+          url.searchParams.set("date", getTodayDateString());
+        } else {
+          url.searchParams.delete("mode");
+          url.searchParams.delete("date");
+        }
       } else {
+        url.searchParams.delete("name");
+        url.searchParams.delete("gender");
         url.searchParams.delete("mode");
         url.searchParams.delete("date");
       }
-    } else {
-      url.searchParams.delete("name");
-      url.searchParams.delete("mode");
-      url.searchParams.delete("date");
-    }
-    window.history.replaceState({}, "", url.toString());
-  }, []);
+      window.history.replaceState({}, "", url.toString());
+    },
+    []
+  );
 
   // 診断実行（ガチャ演出つき）
   const handleDiagnose = (
     customName?: string,
     customMode?: DiagnosisMode,
-    skipAnimation = false
+    skipAnimation = false,
+    customGender?: Gender
   ) => {
     const targetName = (customName !== undefined ? customName : inputName).trim();
     const targetMode = customMode !== undefined ? customMode : mode;
+    const targetGender = customGender !== undefined ? customGender : gender;
 
     if (!targetName) return;
 
@@ -115,9 +132,9 @@ export default function DiagnosisClient({
     }
 
     if (skipAnimation) {
-      const diag = generateDiagnosis(targetName, targetMode);
+      const diag = generateDiagnosis(targetName, targetMode, undefined, targetGender);
       setResult(diag);
-      syncUrlParams(targetName, targetMode);
+      syncUrlParams(targetName, targetMode, targetGender);
       scrollToTop();
       return;
     }
@@ -126,10 +143,10 @@ export default function DiagnosisClient({
     scrollToTop();
 
     setTimeout(() => {
-      const diag = generateDiagnosis(targetName, targetMode);
+      const diag = generateDiagnosis(targetName, targetMode, undefined, targetGender);
       setResult(diag);
       setIsSummoning(false);
-      syncUrlParams(targetName, targetMode);
+      syncUrlParams(targetName, targetMode, targetGender);
       scrollToTop();
     }, 650);
   };
@@ -138,7 +155,21 @@ export default function DiagnosisClient({
   const handleModeToggle = (newMode: DiagnosisMode) => {
     setMode(newMode);
     if (result && inputName.trim()) {
-      handleDiagnose(inputName, newMode, false);
+      handleDiagnose(inputName, newMode, false, gender);
+    }
+  };
+
+  // 性別切り替え時
+  const handleGenderToggle = (newGender: Gender) => {
+    if (gender === newGender) return;
+    setGender(newGender);
+    let nextName = inputName;
+    if (!hasUserEdited) {
+      nextName = newGender === "female" ? "佐藤美咲" : "山田太郎";
+      setInputName(nextName);
+    }
+    if (result && nextName.trim()) {
+      handleDiagnose(nextName, mode, false, newGender);
     }
   };
 
@@ -148,6 +179,9 @@ export default function DiagnosisClient({
     const baseUrl = `${window.location.origin}${window.location.pathname}`;
     const params = new URLSearchParams();
     params.set("name", result.name);
+    if (result.gender === "female") {
+      params.set("gender", "female");
+    }
     if (result.mode === "daily") {
       params.set("mode", "daily");
       if (result.dateStr) params.set("date", result.dateStr);
@@ -160,6 +194,9 @@ export default function DiagnosisClient({
     if (!result) return "/api/og";
     const params = new URLSearchParams();
     params.set("name", result.name);
+    if (result.gender === "female") {
+      params.set("gender", "female");
+    }
     if (result.mode === "daily") {
       params.set("mode", "daily");
       if (result.dateStr) params.set("date", result.dateStr);
@@ -223,6 +260,9 @@ export default function DiagnosisClient({
       const params = new URLSearchParams();
       params.set("name", result.name);
       params.set("side", side);
+      if (result.gender === "female") {
+        params.set("gender", "female");
+      }
       if (result.mode === "daily") {
         params.set("mode", "daily");
         if (result.dateStr) params.set("date", result.dateStr);
@@ -233,7 +273,7 @@ export default function DiagnosisClient({
       const link = document.createElement("a");
       link.href = blobUrl;
       const sideLabel = side === "front" ? "omote" : "ura";
-      link.download = `sticker-${result.name}-${sideLabel}-${result.rarity}.png`;
+      link.download = `sticker-${result.name}-${result.gender}-${sideLabel}-${result.rarity}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -252,36 +292,40 @@ export default function DiagnosisClient({
 
   useEffect(() => {
     // クライアントマウント時に各レアリティ（N・R・ギャップ・SSR・UR）が出るサンプル名を探索してボタン化
-    let nName = "山田太郎";
-    let rName = "鈴木一郎";
-    let urName = "佐藤健太";
-    let ssrName = "高橋美咲";
-    let gapName = "田中太郎";
+    let nName = gender === "female" ? "佐藤美咲" : "山田太郎";
+    let rName = gender === "female" ? "鈴木花子" : "鈴木一郎";
+    let urName = gender === "female" ? "高橋結衣" : "佐藤健太";
+    let ssrName = gender === "female" ? "田中愛美" : "高橋美咲";
+    let gapName = gender === "female" ? "伊藤さくら" : "田中太郎";
 
     for (let i = 1; i <= 1500; i++) {
-      const candidate = `冒険者#${i}`;
-      const d = generateDiagnosis(candidate, "standard");
-      if (d.rarity === "N" && !d.isGap && nName === "山田太郎") {
+      const candidate = gender === "female" ? `戦乙女#${i}` : `冒険者#${i}`;
+      const d = generateDiagnosis(candidate, "standard", undefined, gender);
+      if (d.rarity === "N" && !d.isGap && nName.startsWith(gender === "female" ? "佐藤" : "山田")) {
         nName = candidate;
       }
-      if (d.rarity === "R" && !d.isGap && rName === "鈴木一郎") {
+      if (d.rarity === "R" && !d.isGap && rName.startsWith("鈴木")) {
         rName = candidate;
       }
-      if (d.rarity === "UR" && urName === "佐藤健太") {
+      if (d.rarity === "UR" && urName.startsWith(gender === "female" ? "高橋" : "佐藤")) {
         urName = candidate;
       }
-      if (d.rarity === "SSR" && !d.isGap && ssrName === "高橋美咲") {
+      if (d.rarity === "SSR" && !d.isGap && ssrName.startsWith(gender === "female" ? "田中" : "高橋")) {
         ssrName = candidate;
       }
-      if (d.isGap && (d.rarity === "SR" || d.rarity === "SSR") && gapName === "田中太郎") {
+      if (
+        d.isGap &&
+        (d.rarity === "SR" || d.rarity === "SSR") &&
+        gapName.startsWith(gender === "female" ? "伊藤" : "田中")
+      ) {
         gapName = candidate;
       }
       if (
-        nName !== "山田太郎" &&
-        rName !== "鈴木一郎" &&
-        urName !== "佐藤健太" &&
-        ssrName !== "高橋美咲" &&
-        gapName !== "田中太郎"
+        !nName.startsWith(gender === "female" ? "佐藤" : "山田") &&
+        !rName.startsWith("鈴木") &&
+        !urName.startsWith(gender === "female" ? "高橋" : "佐藤") &&
+        !ssrName.startsWith(gender === "female" ? "田中" : "高橋") &&
+        !gapName.startsWith(gender === "female" ? "伊藤" : "田中")
       ) {
         break;
       }
@@ -294,7 +338,7 @@ export default function DiagnosisClient({
       { label: "SSRサンプル", name: ssrName, badge: "SSR (金キラ)" },
       { label: "UR神話級", name: urName, badge: "UR (虹キラ)" },
     ]);
-  }, []);
+  }, [gender]);
 
   const rarityInfo = result ? RARITY_META[result.rarity] : null;
 
@@ -759,6 +803,39 @@ export default function DiagnosisClient({
             </div>
           </div>
 
+          {/* 性別切り替えトグル */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-5 mb-5 border-b border-amber-500/20">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-stone-300">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>キャラクター対象（性別）：</span>
+            </div>
+
+            <div className="grid grid-cols-2 bg-stone-950 p-1 rounded-xl border border-amber-500/30 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => handleGenderToggle("male")}
+                className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  gender === "male"
+                    ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <span>👦 男性（騎士・魔王系）</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleGenderToggle("female")}
+                className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  gender === "female"
+                    ? "bg-gradient-to-r from-pink-600 to-rose-500 text-white shadow-md shadow-pink-500/25"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <span>👧 女性（戦乙女・聖女系）</span>
+              </button>
+            </div>
+          </div>
+
           {/* 名前入力フォーム */}
           <div className="mb-1.5 pl-1 flex items-center justify-between">
             <label
@@ -790,7 +867,11 @@ export default function DiagnosisClient({
                   setHasUserEdited(true);
                   setInputName(e.target.value);
                 }}
-                placeholder="名前やハンドルネームを入力（例：山田太郎 / @user）"
+                placeholder={
+                  gender === "female"
+                    ? "名前やハンドルネームを入力（例：佐藤美咲 / @user）"
+                    : "名前やハンドルネームを入力（例：山田太郎 / @user）"
+                }
                 maxLength={32}
                 aria-label="診断する名前"
                 className={`w-full px-4 py-3.5 sm:py-4 rounded-xl bg-stone-950/90 border border-amber-500/40 placeholder-stone-500 text-base sm:text-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/25 transition-all ${

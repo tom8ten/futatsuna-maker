@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
-import { generateDiagnosis, DiagnosisMode, Rarity } from "@/lib/dictionary";
-import { ARCHETYPE_META, getBikkurimanArchetype } from "@/lib/bikkuriman";
+import { generateDiagnosis, DiagnosisMode, Rarity, Gender } from "@/lib/dictionary";
+import { ARCHETYPE_META, getArchetypeMeta, getBikkurimanArchetype } from "@/lib/bikkuriman";
 
 export const runtime = "edge";
 
@@ -92,13 +92,16 @@ export async function GET(req: NextRequest) {
   const rawName = searchParams.get("name") || "";
   const modeParam = searchParams.get("mode");
   const dateParam = searchParams.get("date") || undefined;
+  const genderParam = searchParams.get("gender");
+  const gender: Gender = genderParam === "female" ? "female" : "male";
   const mode: DiagnosisMode = modeParam === "daily" ? "daily" : "standard";
 
   const isDefault = !rawName.trim();
-  const result = generateDiagnosis(isDefault ? "伝説の勇者" : rawName, mode, dateParam);
+  const defaultName = gender === "female" ? "伝説の戦乙女" : "伝説の勇者";
+  const result = generateDiagnosis(isDefault ? defaultName : rawName, mode, dateParam, gender);
   const rarityStyle = getRarityStyles(result.rarity);
   const archetype = getBikkurimanArchetype(result.suffix, result.isGap, result.seed);
-  const archetypeMeta = ARCHETYPE_META[archetype];
+  const archetypeMeta = getArchetypeMeta(archetype, result.gender);
   const stickerImgUrl = new URL(archetypeMeta.imageSrc, req.url).toString();
 
   // 描画する全文字列を集めてGoogle Fontsからサブセットを取得

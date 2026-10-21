@@ -5,6 +5,7 @@ import { RotateCw, Sparkles } from "lucide-react";
 import { DiagnosisResult } from "@/lib/dictionary";
 import {
   ARCHETYPE_META,
+  getArchetypeMeta,
   getAttributePalette,
   getBikkurimanArchetype,
   getPrismTypeLabel,
@@ -106,7 +107,7 @@ export default function BikkurimanSticker({ result }: BikkurimanStickerProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const archetype = getBikkurimanArchetype(result.suffix, result.isGap, result.seed);
-  const meta = ARCHETYPE_META[archetype];
+  const meta = getArchetypeMeta(archetype, result.gender);
   const palette = getAttributePalette(result.attribute);
   const prismLabel = getPrismTypeLabel(result.rarity);
   const stickerNo = String((result.seed % 999) + 1).padStart(3, "0");

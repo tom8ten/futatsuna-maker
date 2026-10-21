@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { generateDiagnosis, DiagnosisMode } from "@/lib/dictionary";
+import { generateDiagnosis, DiagnosisMode, Gender } from "@/lib/dictionary";
 import DiagnosisClient from "@/components/DiagnosisClient";
 
 interface PageProps {
@@ -12,6 +12,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const rawName = typeof resolvedParams.name === "string" ? resolvedParams.name.trim() : "";
   const modeParam = typeof resolvedParams.mode === "string" ? resolvedParams.mode : "standard";
   const dateParam = typeof resolvedParams.date === "string" ? resolvedParams.date : undefined;
+  const genderParam = typeof resolvedParams.gender === "string" ? resolvedParams.gender : "male";
+  const gender: Gender = genderParam === "female" ? "female" : "male";
   const mode: DiagnosisMode = modeParam === "daily" ? "daily" : "standard";
 
   const headersList = await headers();
@@ -27,7 +29,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || `${proto}://${safeHost}`;
 
   if (!rawName) {
-    const defaultOgUrl = `${baseUrl}/api/og`;
+    const defaultOgUrl = `${baseUrl}/api/og?gender=${gender}`;
     return {
       title: "二つ名メーカー｜王道×シュール異名＆RPGステータス診断",
       description:
@@ -56,9 +58,10 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     };
   }
 
-  const result = generateDiagnosis(rawName, mode, dateParam);
+  const result = generateDiagnosis(rawName, mode, dateParam, gender);
   const ogParams = new URLSearchParams();
   ogParams.set("name", result.name);
+  ogParams.set("gender", result.gender);
   if (mode === "daily") {
     ogParams.set("mode", "daily");
     if (result.dateStr) ogParams.set("date", result.dateStr);
@@ -97,7 +100,13 @@ export default async function HomePage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const hasNameParam =
     typeof resolvedParams.name === "string" && resolvedParams.name.trim().length > 0;
-  const initialName = hasNameParam ? (resolvedParams.name as string) : "山田太郎";
+  const genderParam = typeof resolvedParams.gender === "string" ? resolvedParams.gender : "male";
+  const initialGender: Gender = genderParam === "female" ? "female" : "male";
+  const initialName = hasNameParam
+    ? (resolvedParams.name as string)
+    : initialGender === "female"
+    ? "佐藤美咲"
+    : "山田太郎";
   const modeParam = typeof resolvedParams.mode === "string" ? resolvedParams.mode : "standard";
   const initialDate = typeof resolvedParams.date === "string" ? resolvedParams.date : undefined;
   const initialMode: DiagnosisMode = modeParam === "daily" ? "daily" : "standard";
@@ -105,6 +114,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   return (
     <DiagnosisClient
       initialName={initialName}
+      initialGender={initialGender}
       initialMode={initialMode}
       initialDate={initialDate}
       autoShowResult={hasNameParam}
